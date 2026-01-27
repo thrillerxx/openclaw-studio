@@ -813,10 +813,6 @@ const AgentCanvasPage = () => {
     dispatch({ type: "setCanvas", patch: nextTransform });
   }, [dispatch, state.canvas, tiles, viewportSize]);
 
-  const handleCenterCanvas = useCallback(() => {
-    dispatch({ type: "setCanvas", patch: { offsetX: 0, offsetY: 0 } });
-  }, [dispatch]);
-
   const canvasPatch = useMemo(() => state.canvas, [state.canvas]);
 
   const handleProjectCreate = useCallback(async () => {
@@ -985,7 +981,6 @@ const AgentCanvasPage = () => {
             onNewAgent={handleNewAgent}
             onCreateDiscordChannel={handleCreateDiscordChannel}
             canCreateDiscordChannel={Boolean(project && project.tiles.length > 0)}
-            onCenterCanvas={handleCenterCanvas}
             zoom={state.canvas.zoom}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}

@@ -11,7 +11,6 @@ type HeaderBarProps = {
   onNewAgent: () => void;
   onCreateDiscordChannel: () => void;
   canCreateDiscordChannel: boolean;
-  onCenterCanvas: () => void;
   zoom: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
@@ -36,7 +35,6 @@ export const HeaderBar = ({
   onNewAgent,
   onCreateDiscordChannel,
   canCreateDiscordChannel,
-  onCenterCanvas,
   zoom,
   onZoomIn,
   onZoomOut,
@@ -119,13 +117,6 @@ export const HeaderBar = ({
             Create Discord Channel
           </button>
         ) : null}
-        <button
-          className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700"
-          type="button"
-          onClick={onCenterCanvas}
-        >
-          Center Canvas
-        </button>
         <div className="flex items-center gap-2 rounded-full border border-slate-300 px-3 py-2">
           <button
             className="text-sm font-semibold text-slate-800"
