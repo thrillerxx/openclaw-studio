@@ -28,9 +28,9 @@ const statusLabel: Record<AgentState["status"], string> = {
 };
 
 const statusClassName: Record<AgentState["status"], string> = {
-  idle: "bg-accent text-accent-foreground border border-border",
-  running: "bg-primary text-primary-foreground",
-  error: "bg-destructive text-destructive-foreground",
+  idle: "border border-border/70 bg-muted text-muted-foreground",
+  running: "border border-primary/30 bg-primary/15 text-foreground",
+  error: "border border-destructive/35 bg-destructive/12 text-destructive",
 };
 
 export const FleetSidebar = ({
@@ -45,7 +45,7 @@ export const FleetSidebar = ({
       className="glass-panel fade-up-delay relative flex h-full w-full min-w-72 flex-col gap-3 p-3 xl:max-w-[320px]"
       data-testid="fleet-sidebar"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[linear-gradient(90deg,color-mix(in_oklch,var(--primary)_18%,transparent)_0%,transparent_80%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[linear-gradient(90deg,color-mix(in_oklch,var(--primary)_8%,transparent)_0%,transparent_80%)]" />
       <div className="px-1">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Fleet
@@ -62,10 +62,10 @@ export const FleetSidebar = ({
               type="button"
               data-testid={option.testId}
               aria-pressed={active}
-              className={`rounded-md border px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
+                className={`rounded-md border px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
                 active
-                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "border-border/80 bg-card/70 text-muted-foreground hover:border-primary/50 hover:bg-card"
+                  ? "border-border bg-muted text-foreground shadow-xs"
+                  : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
               }`}
               onClick={() => onFilterChange(option.value)}
             >
@@ -93,8 +93,8 @@ export const FleetSidebar = ({
                   data-testid={`fleet-agent-row-${agent.agentId}`}
                   className={`group flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left transition ${
                     selected
-                      ? "border-primary/80 bg-primary/10 shadow-sm"
-                      : "border-border/70 bg-card/65 hover:border-primary/40 hover:bg-card"
+                      ? "border-ring/40 bg-muted/60 shadow-xs"
+                      : "border-border/70 bg-card/65 hover:border-border hover:bg-muted/55"
                   }`}
                   onClick={() => onSelectAgent(agent.agentId)}
                 >

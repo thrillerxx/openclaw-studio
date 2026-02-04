@@ -83,10 +83,10 @@ export const AgentChatPanel = ({
 
   const statusColor =
     agent.status === "running"
-      ? "bg-primary text-primary-foreground"
+      ? "border border-primary/30 bg-primary/15 text-foreground"
       : agent.status === "error"
-        ? "bg-destructive text-destructive-foreground"
-        : "bg-accent text-accent-foreground border border-border shadow-sm";
+        ? "border border-destructive/35 bg-destructive/12 text-destructive"
+        : "border border-border/70 bg-muted text-muted-foreground";
   const statusLabel =
     agent.status === "running"
       ? "Running"
@@ -127,7 +127,7 @@ export const AgentChatPanel = ({
                 isSelected={isSelected}
               />
               <button
-                className="nodrag absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground shadow-sm transition hover:border-primary/60 hover:bg-card"
+                className="nodrag absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground shadow-sm transition hover:border-border hover:bg-muted/65"
                 type="button"
                 aria-label="Shuffle avatar"
                 data-testid="agent-avatar-shuffle"
@@ -164,7 +164,7 @@ export const AgentChatPanel = ({
                   }}
                 />
                 <button
-                  className="nodrag flex h-6 w-6 items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground transition hover:border-primary/60 hover:bg-card"
+                  className="nodrag flex h-6 w-6 items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground transition hover:border-border hover:bg-muted/65"
                   type="button"
                   aria-label="Shuffle name"
                   data-testid="agent-name-shuffle"
@@ -184,7 +184,7 @@ export const AgentChatPanel = ({
                   {statusLabel}
                 </span>
                 <button
-                  className="nodrag rounded-md border border-border/80 bg-card/60 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-muted-foreground transition hover:border-primary/50 hover:bg-card"
+                  className="nodrag rounded-md border border-border/80 bg-card/60 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-muted-foreground transition hover:border-border hover:bg-muted/65"
                   type="button"
                   data-testid="agent-inspect-toggle"
                   onClick={onInspect}

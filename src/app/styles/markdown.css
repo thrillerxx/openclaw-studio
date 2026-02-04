@@ -82,7 +82,7 @@
 }
 
 .agent-markdown blockquote {
-  border-left: 3px solid color-mix(in oklch, var(--primary) 44%, var(--border));
+  border-left: 3px solid color-mix(in oklch, var(--primary) 28%, var(--border));
   padding-left: 0.7rem;
   color: var(--muted-foreground);
 }
@@ -101,7 +101,7 @@
 }
 
 .agent-markdown a {
-  color: color-mix(in oklch, var(--primary) 85%, var(--foreground));
+  color: color-mix(in oklch, var(--primary) 68%, var(--foreground));
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;

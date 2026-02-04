@@ -1783,12 +1783,6 @@ const AgentStudioPage = () => {
 
   return (
     <div className="relative min-h-screen w-screen overflow-hidden bg-background">
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute -left-24 top-10 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute right-0 top-1/3 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
-        <div className="absolute bottom-8 left-1/3 h-44 w-44 rounded-full bg-primary/15 blur-3xl" />
-      </div>
-
       <div className="relative z-10 flex h-screen flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
         <div className="w-full">
           <HeaderBar

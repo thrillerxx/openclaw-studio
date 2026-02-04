@@ -15,15 +15,15 @@ const statusStyles: Record<GatewayStatus, { label: string; className: string }> 
   {
     disconnected: {
       label: "Disconnected",
-      className: "bg-muted text-muted-foreground border border-border/70",
+      className: "border border-border/70 bg-muted text-muted-foreground",
     },
     connecting: {
       label: "Connecting",
-      className: "bg-secondary text-secondary-foreground border border-border/70",
+      className: "border border-border/70 bg-secondary text-secondary-foreground",
     },
     connected: {
       label: "Connected",
-      className: "bg-primary text-primary-foreground border border-primary/30",
+      className: "border border-primary/30 bg-primary/15 text-foreground",
     },
   };
 
@@ -50,7 +50,7 @@ export const ConnectionPanel = ({
           {statusConfig.label}
         </span>
         <button
-          className="rounded-md border border-input/90 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition hover:border-ring hover:bg-card disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-md border border-input/90 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition hover:border-border hover:bg-muted/65 disabled:cursor-not-allowed disabled:opacity-60"
           type="button"
           onClick={isConnected ? onDisconnect : onConnect}
           disabled={isConnecting || !gatewayUrl.trim()}

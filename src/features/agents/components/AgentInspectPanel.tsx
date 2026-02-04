@@ -385,7 +385,7 @@ export const AgentInspectPanel = ({
           <div className="console-title text-2xl leading-none text-foreground">{agent.name}</div>
         </div>
         <button
-          className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground transition hover:border-primary/50 hover:bg-card"
+          className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground transition hover:border-border hover:bg-muted/65"
           type="button"
           data-testid="agent-inspect-close"
           onClick={onClose}
@@ -427,7 +427,7 @@ export const AgentInspectPanel = ({
                   className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
                     active
                       ? "border-border bg-background text-foreground shadow-sm"
-                      : "border-transparent bg-muted/60 text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                      : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
                   }`}
                   onClick={() => handleAgentFileTabChange(name)}
                 >
@@ -447,7 +447,7 @@ export const AgentInspectPanel = ({
                 </div>
               </div>
               {!agentFiles[agentFileTab].exists ? (
-                <span className="rounded-md border border-border bg-accent px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">
+                <span className="rounded-md border border-border bg-muted px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                   new
                 </span>
               ) : null}
@@ -745,7 +745,7 @@ export const AgentInspectPanel = ({
                 {heartbeatDirty ? "Remember to save changes." : "Up to date."}
               </div>
               <button
-                className="rounded-md border border-transparent bg-primary px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
+                className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
                 type="button"
                 disabled={heartbeatLoading || heartbeatSaving || !heartbeatDirty}
                 onClick={() => void saveHeartbeat()}
@@ -756,7 +756,7 @@ export const AgentInspectPanel = ({
           </div>
         </section>
 
-        <section className="rounded-md border border-destructive/40 bg-destructive/5 p-4">
+        <section className="rounded-md border border-destructive/30 bg-destructive/4 p-4">
           <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-destructive">
             Delete agent
           </div>
@@ -764,7 +764,7 @@ export const AgentInspectPanel = ({
             Removes the agent from the gateway config.
           </div>
           <button
-            className="mt-3 w-full rounded-md border border-destructive bg-destructive px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-destructive-foreground shadow-sm transition hover:brightness-105"
+            className="mt-3 w-full rounded-md border border-destructive/50 bg-transparent px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-destructive shadow-sm transition hover:bg-destructive/10"
             type="button"
             onClick={onDelete}
           >

@@ -9,9 +9,9 @@ type HeaderBarProps = {
 };
 
 const statusDotStyles: Record<GatewayStatus, string> = {
-  disconnected: "bg-muted",
-  connecting: "bg-secondary",
-  connected: "bg-primary",
+  disconnected: "bg-muted-foreground/45",
+  connecting: "bg-secondary-foreground/55",
+  connected: "bg-primary/75",
 };
 
 const statusLabel: Record<GatewayStatus, string> = {
@@ -28,7 +28,7 @@ export const HeaderBar = ({
 }: HeaderBarProps) => {
   return (
     <div className="glass-panel fade-up relative overflow-hidden px-4 py-4 sm:px-6">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,color-mix(in_oklch,var(--primary)_14%,transparent)_48%,transparent_100%)] opacity-70" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,color-mix(in_oklch,var(--primary)_7%,transparent)_48%,transparent_100%)] opacity-55" />
       <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
           <p className="console-title text-2xl leading-none text-foreground sm:text-3xl">
