@@ -103,7 +103,7 @@ Flow:
   - API routes return JSON `{ error }` with appropriate status.
   - `fetchJson` throws when `!res.ok`, surfaces errors to UI state.
   - `StudioSettingsCoordinator` logs failed async persistence writes (debounced flush or queued patch failures) so settings-save errors are observable.
-- **Filesystem helpers**: server-only utilities live in `src/lib/fs.server.ts` (safe directory/file creation, home-scoped path autocomplete). The path autocomplete response types (`PathAutocompleteEntry`, `PathAutocompleteResult`) are exported from the same module and returned by `src/app/api/path-suggestions/route.ts`. These helpers are used for local settings and path suggestions, not for agent file edits.
+- **Filesystem helpers**: server-only filesystem operations live at the API route boundaries. Home-scoped path autocomplete is implemented directly in `src/app/api/path-suggestions/route.ts`. These helpers are used for local settings and path suggestions, not for agent file edits.
 - **Tracing**: `src/instrumentation.ts` registers `@vercel/otel` for telemetry.
 - **Validation**: request payload validation in API routes and typed client/server helpers in `src/lib/*`.
 
