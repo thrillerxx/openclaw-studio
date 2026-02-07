@@ -369,19 +369,16 @@ const AgentChatComposer = memo(function AgentChatComposer({
     <div
       className="flex items-end gap-2"
       onPointerDown={(event) => {
-        // iOS PWA/Safari can be picky about focusing inputs.
-        // Try to focus during the user gesture if the tap wasn't directly on the textarea.
+        // Important: focus must happen *synchronously* in the user gesture.
+        // If we focus in a timeout, iOS can show a caret but refuse to open the keyboard.
         if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
           localRef.current?.focus();
         }
       }}
-      onTouchStart={() => {
-        // Some iOS builds ignore pointer events for keyboard focus; touchstart is the most reliable.
-        // Use a microtask/timeout to avoid races with scrolling.
-        setTimeout(() => localRef.current?.focus(), 0);
-      }}
-      onClick={() => {
-        setTimeout(() => localRef.current?.focus(), 0);
+      onTouchStart={(event) => {
+        if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
+          localRef.current?.focus();
+        }
       }}
     >
       <textarea
