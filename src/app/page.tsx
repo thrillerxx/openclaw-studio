@@ -285,6 +285,8 @@ const AgentStudioPage = () => {
   const [isIosBrowserMode, setIsIosBrowserMode] = useState(false);
   const [isStandaloneMode, setIsStandaloneMode] = useState(false);
 
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
     const mq = window.matchMedia("(min-width: 1280px)");
@@ -296,6 +298,16 @@ const AgentStudioPage = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    const onWaiting = () => setUpdateAvailable(true);
+    const onControllerChange = () => {
+      // After the new SW takes control, reload to pick up the new assets.
+      window.location.reload();
+    };
+
+    window.addEventListener("hbos-sw-waiting", onWaiting);
+    window.addEventListener("hbos-sw-controllerchange", onControllerChange);
+
     const ua = navigator.userAgent ?? "";
     const isiOS = /iP(hone|ad|od)/.test(ua);
     const standalone =
@@ -309,15 +321,21 @@ const AgentStudioPage = () => {
     const iosBrowser = isiOS && !standalone;
     setIsIosBrowserMode(iosBrowser);
 
-    if (!iosBrowser) return;
-    try {
-      const dismissed = localStorage.getItem("hbos.install.nudge.dismissed") === "1";
-      if (!dismissed) {
-        setPwaInstallNudgeOpen(true);
+    if (iosBrowser) {
+      try {
+        const dismissed = localStorage.getItem("hbos.install.nudge.dismissed") === "1";
+        if (!dismissed) {
+          setPwaInstallNudgeOpen(true);
+        }
+      } catch {
+        // ignore
       }
-    } catch {
-      // ignore
     }
+
+    return () => {
+      window.removeEventListener("hbos-sw-waiting", onWaiting);
+      window.removeEventListener("hbos-sw-controllerchange", onControllerChange);
+    };
   }, []);
 
   const {
@@ -2688,6 +2706,36 @@ const AgentStudioPage = () => {
           </div>
         </div>
       ) : null}
+      {updateAvailable ? (
+        <div className="fixed bottom-4 left-0 right-0 z-[85] flex justify-center px-3">
+          <div className="glass-panel w-full max-w-md px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Update available
+                </div>
+                <div className="mt-1 text-xs text-foreground">Refresh to get the latest build.</div>
+              </div>
+              <button
+                type="button"
+                className="shrink-0 rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary"
+                onClick={() => {
+                  try {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const reg = (window as any).__hbosSwReg as ServiceWorkerRegistration | undefined;
+                    reg?.waiting?.postMessage({ type: "SKIP_WAITING" });
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
           <div className="glass-panel loading-toast px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">

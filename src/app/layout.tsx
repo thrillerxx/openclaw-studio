@@ -60,6 +60,12 @@ export default function RootLayout({
               "(function(){try{var t=localStorage.getItem('theme');var m=window.matchMedia('(prefers-color-scheme: dark)').matches;var d=t?t==='dark':m;document.documentElement.classList.toggle('dark',d);var p=localStorage.getItem('palette');if(p){document.documentElement.setAttribute('data-palette',p);}else{document.documentElement.setAttribute('data-palette','terminal');}var ua='';try{ua=(navigator&&navigator.userAgent)||'';}catch(e){}var isiOS=/iP(hone|ad|od)/.test(ua);document.documentElement.setAttribute('data-platform',isiOS?'ios':'other');var standalone=false;try{standalone=!!(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||!!(navigator&&'standalone'in navigator&&navigator.standalone);}catch(e){}document.documentElement.setAttribute('data-display-mode',standalone?'standalone':'browser');}catch(e){}})();",
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(!('serviceWorker'in navigator))return;window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').then(function(reg){window.__hbosSwReg=reg;function notifyWaiting(){try{window.dispatchEvent(new CustomEvent('hbos-sw-waiting'));}catch(e){}}if(reg.waiting)notifyWaiting();reg.addEventListener('updatefound',function(){var sw=reg.installing;if(!sw)return;sw.addEventListener('statechange',function(){if(sw.state==='installed'&&navigator.serviceWorker.controller){notifyWaiting();}});});navigator.serviceWorker.addEventListener('controllerchange',function(){try{window.dispatchEvent(new CustomEvent('hbos-sw-controllerchange'));}catch(e){}});}).catch(function(){});});}catch(e){}})();",
+          }}
+        />
       </head>
       <body className={`${display.variable} ${sans.variable} ${mono.variable} antialiased`}>
         {children}

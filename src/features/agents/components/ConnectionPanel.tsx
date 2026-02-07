@@ -82,6 +82,48 @@ export const ConnectionPanel = ({
           />
         </label>
       </div>
+      <div className="rounded-md border border-border/70 bg-card/60 px-4 py-3">
+        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          App
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-md border border-border/70 bg-muted px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {/* iOS Safari sets navigator.standalone */}
+            Installed:{" "}
+            {(() => {
+              try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const standalone = Boolean((navigator as any).standalone) ||
+                  (typeof window !== "undefined" &&
+                    typeof window.matchMedia === "function" &&
+                    window.matchMedia("(display-mode: standalone)").matches);
+                return standalone ? "Yes" : "No";
+              } catch {
+                return "Unknown";
+              }
+            })()}
+          </span>
+          <span className="inline-flex items-center rounded-md border border-border/70 bg-muted px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Display:{" "}
+            {(() => {
+              try {
+                if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+                  return window.matchMedia("(display-mode: standalone)").matches
+                    ? "Standalone"
+                    : "Browser";
+                }
+                return "Browser";
+              } catch {
+                return "Browser";
+              }
+            })()}
+          </span>
+        </div>
+        <div className="mt-2 text-xs text-muted-foreground">
+          Tip: on iPhone, Safari → Share → “Add to Home Screen” gives the best experience.
+        </div>
+      </div>
+
       {error ? (
         <p className="rounded-md border border-destructive bg-destructive px-4 py-2 text-sm text-destructive-foreground">
           {error}
