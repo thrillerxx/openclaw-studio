@@ -320,6 +320,13 @@ textarea:focus::-webkit-scrollbar {
   backdrop-filter: none;
 }
 
+/* Nuclear option: iOS Safari/PWA sometimes breaks keyboard for focused inputs when ANY ancestor uses backdrop-filter.
+   Ensure we kill it everywhere on iOS. */
+:root[data-platform="ios"] * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 .fade-up {
   animation: fadeUp 540ms cubic-bezier(0.2, 0.74, 0.2, 1) both;
 }
