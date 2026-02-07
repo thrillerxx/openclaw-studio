@@ -2815,7 +2815,7 @@ const AgentStudioPage = () => {
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Agent create in progress
+              Hacker creation in progress
             </div>
             <div className="mt-2 text-base font-semibold text-foreground">
               {createAgentBlock.agentName}
@@ -2841,7 +2841,7 @@ const AgentStudioPage = () => {
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Agent rename in progress
+              Hacker rename in progress
             </div>
             <div className="mt-2 text-base font-semibold text-foreground">
               {renameAgentBlock.agentName}
@@ -2867,7 +2867,7 @@ const AgentStudioPage = () => {
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Agent delete in progress
+              Hacker deletion in progress
             </div>
             <div className="mt-2 text-base font-semibold text-foreground">
               {deleteAgentBlock.agentName}

@@ -97,7 +97,7 @@ describe("AgentBrainPanel", () => {
       })
     );
 
-    expect(screen.getByRole("button", { name: "AGENTS" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "HACKERS" })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText("alpha agents")).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("AgentBrainPanel", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Agent ID is missing for this agent.")).toBeInTheDocument();
+      expect(screen.getByText("Hacker ID is missing for this hacker.")).toBeInTheDocument();
     });
   });
 

@@ -241,7 +241,7 @@ export const AgentSettingsPanel = ({
             Session
           </div>
           <div className="mt-3 text-[11px] text-muted-foreground">
-            Start this agent in a fresh session and clear the visible transcript in Studio.
+            Start this hacker in a fresh session and clear the visible transcript in Studio.
           </div>
           <button
             className="mt-3 w-full rounded-md border border-border/80 bg-card/75 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:border-border hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-70"
@@ -272,7 +272,7 @@ export const AgentSettingsPanel = ({
           ) : null}
           {!cronLoading && !cronError && cronJobs.length === 0 ? (
             <div className="mt-3 text-[11px] text-muted-foreground">
-              No cron jobs for this agent.
+              No cron jobs for this hacker.
             </div>
           ) : null}
           {!cronLoading && !cronError && cronJobs.length > 0 ? (
@@ -345,7 +345,7 @@ export const AgentSettingsPanel = ({
           ) : null}
           {!heartbeatLoading && !heartbeatError && heartbeats.length === 0 ? (
             <div className="mt-3 text-[11px] text-muted-foreground">
-              No heartbeats for this agent.
+              No heartbeats for this hacker.
             </div>
           ) : null}
           {!heartbeatLoading && !heartbeatError && heartbeats.length > 0 ? (
@@ -408,26 +408,26 @@ export const AgentSettingsPanel = ({
         {canDelete ? (
           <section className="rounded-md border border-destructive/30 bg-destructive/4 p-4">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-destructive">
-              Delete agent
+              Delete hacker
             </div>
             <div className="mt-3 text-[11px] text-muted-foreground">
-              Removes the agent from the gateway config and deletes its cron jobs.
+              Removes the hacker from the gateway config and deletes its cron jobs.
             </div>
             <button
               className="mt-3 w-full rounded-md border border-destructive/50 bg-transparent px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-destructive shadow-sm transition hover:bg-destructive/10"
               type="button"
               onClick={onDelete}
             >
-              Delete agent
+              Delete hacker
             </button>
           </section>
         ) : (
           <section className="rounded-md border border-border/80 bg-card/70 p-4">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              System agent
+              System hacker
             </div>
             <div className="mt-3 text-[11px] text-muted-foreground">
-              The main agent is reserved and cannot be deleted.
+              The main hacker is reserved and cannot be deleted.
             </div>
           </section>
         )}

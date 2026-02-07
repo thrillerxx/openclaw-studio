@@ -45,7 +45,7 @@ export const useAgentFilesEditor = (params: {
       if (!trimmedAgentId) {
         setAgentFiles(createAgentFilesState());
         setAgentFilesDirty(false);
-        setAgentFilesError("Agent ID is missing for this agent.");
+        setAgentFilesError("Hacker ID is missing for this hacker.");
         return;
       }
       if (!client) {
@@ -96,7 +96,7 @@ export const useAgentFilesEditor = (params: {
     try {
       const trimmedAgentId = agentId?.trim();
       if (!trimmedAgentId) {
-        setAgentFilesError("Agent ID is missing for this agent.");
+        setAgentFilesError("Hacker ID is missing for this hacker.");
         return false;
       }
       if (!client) {

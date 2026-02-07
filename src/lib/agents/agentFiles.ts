@@ -15,7 +15,8 @@ export const isAgentFileName = (value: string): value is AgentFileName =>
 
 export const AGENT_FILE_META: Record<AgentFileName, { title: string; hint: string }> = {
   "AGENTS.md": {
-    title: "AGENTS.md",
+    // File stays AGENTS.md on disk, but in HackerBot OS we present it as “HACKERS”.
+    title: "HACKERS.md",
     hint: "Operating instructions, priorities, and rules.",
   },
   "SOUL.md": {
@@ -40,12 +41,12 @@ export const AGENT_FILE_META: Record<AgentFileName, { title: string; hint: strin
   },
   "MEMORY.md": {
     title: "MEMORY.md",
-    hint: "Durable memory for this agent.",
+    hint: "Durable memory for this hacker.",
   },
 };
 
 export const AGENT_FILE_PLACEHOLDERS: Record<AgentFileName, string> = {
-  "AGENTS.md": "How should this agent work? Priorities, rules, and habits.",
+  "AGENTS.md": "How should this hacker work? Priorities, rules, and habits.",
   "SOUL.md": "Tone, personality, boundaries, and how it should sound.",
   "IDENTITY.md": "Name, vibe, emoji, and a one-line identity.",
   "USER.md": "How should it address you? Preferences and context.",

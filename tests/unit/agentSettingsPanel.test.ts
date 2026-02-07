@@ -316,7 +316,7 @@ describe("AgentSettingsPanel", () => {
       })
     );
 
-    expect(screen.getByText("No cron jobs for this agent.")).toBeInTheDocument();
+    expect(screen.getByText("No cron jobs for this hacker.")).toBeInTheDocument();
   });
 
   it("renders_heartbeat_section_below_cron", () => {
