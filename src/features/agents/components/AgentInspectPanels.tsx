@@ -267,28 +267,7 @@ export const AgentSettingsPanel = ({
               }}
             />
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                {avatarDraft.trim().startsWith("data:image/") ? (
-                  <img
-                    src={avatarDraft}
-                    alt="Hacker avatar preview"
-                    className="h-8 w-8 rounded-md border border-border/80 object-cover"
-                  />
-                ) : (
-                  <div className="h-8 w-8 rounded-md border border-border/70 bg-muted/40" />
-                )}
-
-                <button
-                  type="button"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input/90 bg-background/70 text-muted-foreground transition hover:border-border hover:bg-muted/65"
-                  aria-label="Avatar info"
-                  title="Stored locally in studio settings"
-                >
-                  i
-                </button>
-              </div>
-
+            <div className="mt-3 flex flex-col items-start gap-3">
               <button
                 className="rounded-md border border-input/90 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition hover:border-border hover:bg-muted/65 disabled:cursor-not-allowed disabled:opacity-60"
                 type="button"
@@ -298,6 +277,27 @@ export const AgentSettingsPanel = ({
               >
                 Upload
               </button>
+
+              <div className="flex items-center gap-2">
+                {avatarDraft.trim().startsWith("data:image/") ? (
+                  <img
+                    src={avatarDraft}
+                    alt="Hacker avatar preview"
+                    className="h-9 w-9 rounded-md border border-border/80 object-cover"
+                  />
+                ) : (
+                  <div className="h-9 w-9 rounded-md border border-border/70 bg-muted/40" />
+                )}
+
+                <button
+                  type="button"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input/90 bg-background/70 text-muted-foreground transition hover:border-border hover:bg-muted/65"
+                  aria-label="Hacker avatar info"
+                  title="Stored locally in studio settings"
+                >
+                  i
+                </button>
+              </div>
             </div>
 
             {avatarError ? (
