@@ -366,20 +366,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
   );
 
   return (
-    <div
-      className="flex items-end gap-2"
-      onPointerDown={() => {
-        // iOS standalone can be finicky about which element receives the tap.
-        // Force-focus the textarea during the user gesture.
-        localRef.current?.focus();
-      }}
-      onTouchStart={() => {
-        localRef.current?.focus();
-      }}
-      onClick={() => {
-        localRef.current?.focus();
-      }}
-    >
+    <div className="flex items-end gap-2">
       <textarea
         ref={handleRef}
         rows={1}
@@ -387,12 +374,20 @@ const AgentChatComposer = memo(function AgentChatComposer({
         inputMode="text"
         enterKeyHint="send"
         className="flex-1 min-h-10 resize-none rounded-md border border-border/80 bg-card/75 px-3 py-2 text-[16px] leading-5 text-foreground outline-none transition focus:border-ring sm:min-h-0 sm:text-[11px] sm:leading-normal"
-        onTouchStart={(event) => {
-          // Direct taps should always focus the input (helps iOS standalone).
-          event.currentTarget.focus();
-        }}
-        onClick={(event) => {
-          event.currentTarget.focus();
+        style={{ touchAction: "manipulation" }}
+        onFocus={(event) => {
+          // iOS: keep the keyboard open by avoiding extra programmatic focus/scroll churn.
+          // We *only* do a gentle scroll-into-view on focus.
+          try {
+            // Some browsers support this to avoid jumping.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (event.currentTarget as any).focus?.({ preventScroll: true });
+          } catch {
+            // ignore
+          }
+          requestAnimationFrame(() => {
+            event.currentTarget.scrollIntoView({ block: "nearest" });
+          });
         }}
         onChange={onChange}
         onKeyDown={onKeyDown}
