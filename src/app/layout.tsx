@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "HackerBot OS",
   description: "Focused operator studio for the OpenClaw gateway.",
+  icons: {
+    icon: [{ url: "/hbos-icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 const display = Bebas_Neue({

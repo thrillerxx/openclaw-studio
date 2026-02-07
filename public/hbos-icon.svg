@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HackerBot OS icon">
+  <defs>
+    <!-- Subtle embossed look for the inner S -->
+    <filter id="emboss" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feOffset in="SourceAlpha" dx="0" dy="2" result="off"/>
+      <feGaussianBlur in="off" stdDeviation="2" result="blur"/>
+      <feComposite in="blur" in2="SourceAlpha" operator="out" result="shadow"/>
+      <feColorMatrix in="shadow" type="matrix" values="0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 0.35 0" result="shadowColor"/>
+      <feMerge>
+        <feMergeNode in="shadowColor"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background (transparent by default). Uncomment to force a solid tile.
+  <rect width="512" height="512" fill="#ffffff"/>
+  -->
+
+  <!-- Icon: an "O" ring with an embossed outlined "S" inside -->
+  <g transform="translate(256 256)">
+    <!-- Outer O -->
+    <circle r="190" fill="none" stroke="currentColor" stroke-width="64"/>
+    <!-- Inner highlight ring to mimic the reference "O" inset -->
+    <circle r="110" fill="none" stroke="currentColor" stroke-width="10" opacity="0.85"/>
+
+    <!-- The S inside the O (outlined + embossed) -->
+    <g filter="url(#emboss)">
+      <!-- We draw an S as a path so it looks consistent cross-platform -->
+      <path
+        d="M 65 -120
+           C 20 -155, -75 -150, -105 -92
+           C -130 -45, -105 -10, -25 12
+           C 55 35, 70 55, 50 86
+           C 20 140, -70 135, -110 92"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="34"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <!-- Inner stroke to sell the outline/engrave feel -->
+      <path
+        d="M 65 -120
+           C 20 -155, -75 -150, -105 -92
+           C -130 -45, -105 -10, -25 12
+           C 55 35, 70 55, 50 86
+           C 20 140, -70 135, -110 92"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.18"
+      />
+    </g>
+  </g>
+</svg>
