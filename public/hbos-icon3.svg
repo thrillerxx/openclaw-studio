@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HBOS glossy app icon">
+  <defs>
+    <!-- Background gloss gradients -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1a1d"/>
+      <stop offset="0.55" stop-color="#0f0f12"/>
+      <stop offset="1" stop-color="#050507"/>
+    </linearGradient>
+
+    <radialGradient id="vignette" cx="50%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+
+    <!-- Shine sweep -->
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="0.50" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.65" stop-color="#ffffff" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Inner stroke -->
+    <linearGradient id="innerStroke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+
+    <!-- Text gradient (lavender/steel like reference) -->
+    <linearGradient id="txt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9d4ff"/>
+      <stop offset="0.55" stop-color="#b8b3df"/>
+      <stop offset="1" stop-color="#8f8ab8"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+      <feOffset dx="0" dy="14" result="off"/>
+      <feColorMatrix in="off" type="matrix" values="0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 0.45 0" result="shadow"/>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="textGlow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="1 0 0 0 0
+                                                 1 0 0 0 0
+                                                 1 0 0 0 0
+                                                 0 0 0 0.18 0" result="ga"/>
+      <feMerge>
+        <feMergeNode in="ga"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="clip">
+      <rect x="44" y="44" width="424" height="424" rx="92" ry="92"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer tile shadow -->
+  <g filter="url(#softShadow)">
+    <!-- Tile -->
+    <rect x="44" y="44" width="424" height="424" rx="92" ry="92" fill="url(#bg)"/>
+    <!-- Inner border -->
+    <rect x="62" y="62" width="388" height="388" rx="78" ry="78" fill="none" stroke="url(#innerStroke)" stroke-width="6"/>
+
+    <!-- Vignette + depth -->
+    <rect x="44" y="44" width="424" height="424" rx="92" ry="92" fill="url(#vignette)" opacity="0.95"/>
+
+    <!-- Shine sweep clipped to tile -->
+    <g clip-path="url(#clip)">
+      <path d="M-40 120 L 140 -40 L 560 380 L 380 560 Z" fill="url(#shine)"/>
+      <!-- top gloss strip -->
+      <path d="M44 44 h424 v160 c-88 30-184 38-260 30C126 226 78 212 44 194Z" fill="#ffffff" opacity="0.06"/>
+    </g>
+
+    <!-- HBOS wordmark -->
+    <g transform="translate(256 292)" filter="url(#textGlow)">
+      <!-- subtle engrave shadow behind text -->
+      <text x="0" y="0" text-anchor="middle" dominant-baseline="middle"
+            font-family="Bebas Neue, Impact, Haettenschweiler, 'Arial Black', sans-serif"
+            font-size="180" letter-spacing="10"
+            fill="#000000" opacity="0.35" transform="translate(0 6)">
+        HBOS
+      </text>
+      <!-- main text -->
+      <text x="0" y="0" text-anchor="middle" dominant-baseline="middle"
+            font-family="Bebas Neue, Impact, Haettenschweiler, 'Arial Black', sans-serif"
+            font-size="180" letter-spacing="10"
+            fill="url(#txt)">
+        HBOS
+      </text>
+      <!-- highlight stroke for embossed edge -->
+      <text x="0" y="0" text-anchor="middle" dominant-baseline="middle"
+            font-family="Bebas Neue, Impact, Haettenschweiler, 'Arial Black', sans-serif"
+            font-size="180" letter-spacing="10"
+            fill="none" stroke="#ffffff" stroke-width="4" opacity="0.10">
+        HBOS
+      </text>
+    </g>
+  </g>
+</svg>
