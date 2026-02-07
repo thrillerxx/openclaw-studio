@@ -2543,7 +2543,10 @@ const AgentStudioPage = () => {
             onChange={(event) => setCommandDraft(event.target.value)}
             onKeyDown={handleCommandKeyDown}
             placeholder="/kida2 …  |  /status"
-            className="flex-1 bg-transparent font-mono text-[12px] text-foreground outline-none placeholder:text-muted-foreground"
+            inputMode="text"
+            enterKeyHint="go"
+            style={{ touchAction: "manipulation" }}
+            className="flex-1 min-h-10 rounded-md border border-border/80 bg-card/75 px-3 py-2 font-mono text-[16px] leading-5 text-foreground outline-none transition focus:border-ring placeholder:text-muted-foreground sm:min-h-0 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px] sm:leading-normal"
             aria-label="HackerBot OS command bar"
           />
           <button
