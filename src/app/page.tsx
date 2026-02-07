@@ -2779,21 +2779,27 @@ const AgentStudioPage = () => {
                 Close
               </button>
             </div>
-            <div className="mt-4 space-y-2">
-              {filteredAgents.map((agent) => (
-                <div
-                  key={agent.agentId}
-                  className="flex items-center justify-between rounded-md border border-border/70 bg-muted/30 px-3 py-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="font-mono text-[11px] font-semibold text-foreground">{agent.agentId}</div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                      {agent.status}
-                    </div>
-                  </div>
-                  <div className="font-mono text-[10px] text-muted-foreground">{agent.model}</div>
+            <div className="mt-4 max-h-[60vh] overflow-auto space-y-2">
+              {filteredAgents.length === 0 ? (
+                <div className="rounded-md border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+                  No hackers connected yet. Check your gateway URL/token.
                 </div>
-              ))}
+              ) : (
+                filteredAgents.map((agent) => (
+                  <div
+                    key={agent.agentId}
+                    className="flex items-center justify-between rounded-md border border-border/70 bg-muted/30 px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="font-mono text-[11px] font-semibold text-foreground">{agent.agentId}</div>
+                      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                        {agent.status}
+                      </div>
+                    </div>
+                    <div className="font-mono text-[10px] text-muted-foreground">{agent.model}</div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
