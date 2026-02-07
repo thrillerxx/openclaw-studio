@@ -23,9 +23,22 @@ export const HeaderBar = ({
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,color-mix(in_oklch,var(--primary)_7%,transparent)_48%,transparent_100%)] opacity-55" />
       <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
-          <p className="console-title text-2xl leading-none text-foreground sm:text-3xl">
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                // “Fresh refresh”: reset to default pane + close overlays.
+                window.location.href = "/";
+              } catch {
+                // noop
+              }
+            }}
+            className="console-title text-left text-2xl leading-none text-foreground sm:text-3xl"
+            aria-label="Go to HackerBot OS home"
+            title="Home"
+          >
             HackerBot OS
-          </p>
+          </button>
         </div>
 
         <div className="flex items-center justify-end gap-2">
