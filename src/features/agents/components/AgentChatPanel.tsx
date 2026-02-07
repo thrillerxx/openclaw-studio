@@ -369,11 +369,19 @@ const AgentChatComposer = memo(function AgentChatComposer({
     <div
       className="flex items-end gap-2"
       onPointerDown={(event) => {
-        // iOS PWA/Safari can sometimes fail to focus the textarea when tapping near its edges.
-        // Ensure the tap always targets the input.
+        // iOS PWA/Safari can be picky about focusing inputs.
+        // Try to focus during the user gesture if the tap wasn't directly on the textarea.
         if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
           localRef.current?.focus();
         }
+      }}
+      onTouchStart={() => {
+        // Some iOS builds ignore pointer events for keyboard focus; touchstart is the most reliable.
+        // Use a microtask/timeout to avoid races with scrolling.
+        setTimeout(() => localRef.current?.focus(), 0);
+      }}
+      onClick={() => {
+        setTimeout(() => localRef.current?.focus(), 0);
       }}
     >
       <textarea
@@ -383,6 +391,10 @@ const AgentChatComposer = memo(function AgentChatComposer({
         inputMode="text"
         enterKeyHint="send"
         className="flex-1 min-h-10 resize-none rounded-md border border-border/80 bg-card/75 px-3 py-2 text-[16px] leading-5 text-foreground outline-none transition focus:border-ring sm:min-h-0 sm:text-[11px] sm:leading-normal"
+        onTouchStart={(event) => {
+          // Direct taps should always focus the input (helps iOS standalone).
+          event.currentTarget.focus();
+        }}
         onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder="/kida2 … (or type a message)"
