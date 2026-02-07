@@ -53,7 +53,7 @@ export const FleetSidebar = ({
       data-testid="fleet-sidebar"
     >
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="console-title text-2xl leading-none text-foreground">Agents ({agents.length})</p>
+        <p className="console-title text-2xl leading-none text-foreground">Hackers ({agents.length})</p>
         <button
           type="button"
           data-testid="fleet-new-agent-button"
@@ -61,7 +61,7 @@ export const FleetSidebar = ({
           onClick={onCreateAgent}
           disabled={createDisabled || createBusy}
         >
-          {createBusy ? "Creating..." : "New Agent"}
+          {createBusy ? "Creating..." : "New Hacker"}
         </button>
       </div>
 
