@@ -40,6 +40,84 @@ type AgentChatPanelProps = {
   onAvatarShuffle: () => void;
 };
 
+const AgentChatFinalItems = memo(function AgentChatFinalItems({
+  agentId,
+  name,
+  avatarSeed,
+  avatarUrl,
+  chatItems,
+  autoExpandThinking,
+  lastThinkingItemIndex,
+}: {
+  agentId: string;
+  name: string;
+  avatarSeed: string;
+  avatarUrl: string | null;
+  chatItems: AgentChatItem[];
+  autoExpandThinking: boolean;
+  lastThinkingItemIndex: number;
+}) {
+  return (
+    <>
+      {chatItems.map((item, index) => {
+        if (item.kind === "thinking") {
+          return (
+            <details
+              key={`chat-${agentId}-thinking-${index}`}
+              className="rounded-md border border-border/70 bg-muted/55 text-[11px] text-muted-foreground"
+              open={autoExpandThinking && index === lastThinkingItemIndex}
+            >
+              <summary className="flex cursor-pointer list-none items-center gap-2 px-2 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] [&::-webkit-details-marker]:hidden">
+                <AgentAvatar seed={avatarSeed} name={name} avatarUrl={avatarUrl} size={22} />
+                <span>Thinking</span>
+              </summary>
+              <div className="agent-markdown px-2 pb-2 text-foreground">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+              </div>
+            </details>
+          );
+        }
+        if (item.kind === "user") {
+          return (
+            <div
+              key={`chat-${agentId}-user-${index}`}
+              className="rounded-md border border-border/70 bg-muted/70 px-3 py-2 text-foreground"
+            >
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
+            </div>
+          );
+        }
+        if (item.kind === "tool") {
+          const { summaryText, body } = summarizeToolLabel(item.text);
+          return (
+            <details
+              key={`chat-${agentId}-tool-${index}`}
+              className="rounded-md border border-border/70 bg-muted/55 px-2 py-1 text-[11px] text-muted-foreground"
+            >
+              <summary className="cursor-pointer select-none font-mono text-[10px] font-semibold uppercase tracking-[0.11em]">
+                {summaryText}
+              </summary>
+              {body ? (
+                <div className="agent-markdown mt-1 text-foreground">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                </div>
+              ) : null}
+            </details>
+          );
+        }
+        return (
+          <div
+            key={`chat-${agentId}-assistant-${index}`}
+            className="agent-markdown rounded-md border border-transparent px-0.5"
+          >
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+          </div>
+        );
+      })}
+    </>
+  );
+});
+
 const AgentChatTranscript = memo(function AgentChatTranscript({
   agentId,
   name,
@@ -172,73 +250,15 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
             <EmptyStatePanel title="No messages yet." compact className="p-3 text-xs" />
           ) : (
             <>
-              {chatItems.map((item, index) => {
-                if (item.kind === "thinking") {
-                  return (
-                    <details
-                      key={`chat-${agentId}-thinking-${index}`}
-                      className="rounded-md border border-border/70 bg-muted/55 text-[11px] text-muted-foreground"
-                      open={autoExpandThinking && index === lastThinkingItemIndex}
-                    >
-                      <summary className="flex cursor-pointer list-none items-center gap-2 px-2 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.11em] [&::-webkit-details-marker]:hidden">
-                        <AgentAvatar
-                          seed={avatarSeed}
-                          name={name}
-                          avatarUrl={avatarUrl}
-                          size={22}
-                        />
-                        <span>Thinking</span>
-                        {status === "running" && item.live ? (
-                          <span className="typing-dots" aria-hidden="true">
-                            <span />
-                            <span />
-                            <span />
-                          </span>
-                        ) : null}
-                      </summary>
-                      <div className="agent-markdown px-2 pb-2 text-foreground">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
-                      </div>
-                    </details>
-                  );
-                }
-                if (item.kind === "user") {
-                  return (
-                    <div
-                      key={`chat-${agentId}-user-${index}`}
-                      className="rounded-md border border-border/70 bg-muted/70 px-3 py-2 text-foreground"
-                    >
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
-                    </div>
-                  );
-                }
-                if (item.kind === "tool") {
-                  const { summaryText, body } = summarizeToolLabel(item.text);
-                  return (
-                    <details
-                      key={`chat-${agentId}-tool-${index}`}
-                      className="rounded-md border border-border/70 bg-muted/55 px-2 py-1 text-[11px] text-muted-foreground"
-                    >
-                      <summary className="cursor-pointer select-none font-mono text-[10px] font-semibold uppercase tracking-[0.11em]">
-                        {summaryText}
-                      </summary>
-                      {body ? (
-                        <div className="agent-markdown mt-1 text-foreground">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
-                        </div>
-                      ) : null}
-                    </details>
-                  );
-                }
-                return (
-                  <div
-                    key={`chat-${agentId}-assistant-${index}`}
-                    className="agent-markdown rounded-md border border-transparent px-0.5"
-                  >
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
-                  </div>
-                );
-              })}
+              <AgentChatFinalItems
+                agentId={agentId}
+                name={name}
+                avatarSeed={avatarSeed}
+                avatarUrl={avatarUrl}
+                chatItems={chatItems}
+                autoExpandThinking={autoExpandThinking}
+                lastThinkingItemIndex={lastThinkingItemIndex}
+              />
               {liveThinkingText ? (
                 <details
                   className="rounded-md border border-border/70 bg-muted/55 text-[11px] text-muted-foreground"
