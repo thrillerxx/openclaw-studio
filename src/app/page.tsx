@@ -2522,6 +2522,9 @@ const AgentStudioPage = () => {
             <div className="mt-3 text-sm text-muted-foreground">
               {status === "connecting" ? "Connecting to gateway…" : "Loading hackers…"}
             </div>
+            <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full border border-border/70 bg-muted/40">
+              <div className="h-full w-1/3 rounded-full bg-primary/70 loading-bar" />
+            </div>
           </div>
         </div>
       </div>
@@ -2533,7 +2536,10 @@ const AgentStudioPage = () => {
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
           <div className="glass-panel px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            Loading hackers…
+            <div>Loading hackers…</div>
+            <div className="mt-2 h-1 w-full overflow-hidden rounded-full border border-border/70 bg-muted/40">
+              <div className="h-full w-1/3 rounded-full bg-primary/70 loading-bar" />
+            </div>
           </div>
         </div>
       ) : null}
