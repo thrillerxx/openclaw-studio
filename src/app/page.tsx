@@ -281,6 +281,7 @@ const AgentStudioPage = () => {
   const [isXlLayout, setIsXlLayout] = useState(true);
 
   const [pwaInstallHelpOpen, setPwaInstallHelpOpen] = useState(false);
+  const [pwaInstallNudgeOpen, setPwaInstallNudgeOpen] = useState(false);
   const [isIosBrowserMode, setIsIosBrowserMode] = useState(false);
   const [isStandaloneMode, setIsStandaloneMode] = useState(false);
 
@@ -305,7 +306,18 @@ const AgentStudioPage = () => {
       Boolean((navigator as any).standalone);
 
     setIsStandaloneMode(standalone);
-    setIsIosBrowserMode(isiOS && !standalone);
+    const iosBrowser = isiOS && !standalone;
+    setIsIosBrowserMode(iosBrowser);
+
+    if (!iosBrowser) return;
+    try {
+      const dismissed = localStorage.getItem("hbos.install.nudge.dismissed") === "1";
+      if (!dismissed) {
+        setPwaInstallNudgeOpen(true);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
 
   const {
@@ -2579,9 +2591,69 @@ const AgentStudioPage = () => {
         </div>
       ) : null}
 
-      {pwaInstallHelpOpen ? (
+      {pwaInstallNudgeOpen ? (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center bg-background/60 px-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Install HackerBot OS"
+          onClick={() => {
+            setPwaInstallNudgeOpen(false);
+            try {
+              localStorage.setItem("hbos.install.nudge.dismissed", "1");
+            } catch {
+              // ignore
+            }
+          }}
+        >
+          <div
+            className="glass-panel w-full max-w-sm border border-border/80 px-5 py-4"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Install HackerBot OS
+            </div>
+            <div className="mt-2 text-sm text-foreground">
+              Add HackerBot OS to your Home Screen for the best iPhone experience.
+            </div>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-md border border-border/80 bg-card/75 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                onClick={() => {
+                  setPwaInstallNudgeOpen(false);
+                  try {
+                    localStorage.setItem("hbos.install.nudge.dismissed", "1");
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                Not now
+              </button>
+              <button
+                type="button"
+                className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary"
+                onClick={() => {
+                  setPwaInstallHelpOpen(true);
+                  setPwaInstallNudgeOpen(false);
+                  try {
+                    localStorage.setItem("hbos.install.nudge.dismissed", "1");
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                How
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {pwaInstallHelpOpen ? (
+        <div
+          className="fixed inset-0 z-[95] flex items-center justify-center bg-background/60 px-6"
           role="dialog"
           aria-modal="true"
           aria-label="Install HackerBot OS"
