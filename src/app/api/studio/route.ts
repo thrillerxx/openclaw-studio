@@ -8,10 +8,50 @@ export const runtime = "nodejs";
 const isPatch = (value: unknown): value is StudioSettingsPatch =>
   Boolean(value && typeof value === "object");
 
-export async function GET() {
+const resolveGatewayUrlForRequest = (
+  settings: ReturnType<typeof loadStudioSettings>,
+  request: Request
+) => {
+  const configured = settings.gateway?.url?.trim() ?? "";
+  if (!configured) return "";
+
+  // If we're being accessed via Tailscale Serve over HTTPS (MagicDNS .ts.net),
+  // the client must NOT try to connect to ws://127.0.0.1 (phone != gateway host).
+  // Conversely, when accessed locally, we prefer loopback for safety.
+  const host = request.headers.get("host") ?? "";
+  const isTailscaleHost = host.includes(".ts.net");
+
+  if (isTailscaleHost) {
+    // Prefer a stable remote URL on the same host.
+    // We expose the gateway HTTP websocket endpoint behind /gateway via tailscale serve.
+    return `wss://${host}/gateway`;
+  }
+
+  // Local browsing: keep remote configs as-is, but pin loopback-ish configs to the
+  // local gateway port to avoid accidentally pointing at the wrong host.
+  if (/^ws:\/\/(127\.0\.0\.1|localhost)(:\d+)?\b/i.test(configured)) {
+    return "ws://127.0.0.1:18790";
+  }
+
+  return configured;
+};
+
+export async function GET(request: Request = new Request("http://localhost")) {
   try {
     const settings = loadStudioSettings();
-    return NextResponse.json({ settings });
+    if (!settings.gateway) {
+      return NextResponse.json({ settings });
+    }
+
+    const gatewayUrl = resolveGatewayUrlForRequest(settings, request);
+    const patched = {
+      ...settings,
+      gateway: {
+        ...settings.gateway,
+        url: gatewayUrl || settings.gateway.url,
+      },
+    };
+    return NextResponse.json({ settings: patched });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to load studio settings.";
     console.error(message);
