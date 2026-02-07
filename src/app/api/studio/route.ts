@@ -23,8 +23,10 @@ const resolveGatewayUrlForRequest = (
 
   if (isTailscaleHost) {
     // Prefer a stable remote URL on the same host.
-    // We expose the gateway HTTP websocket endpoint behind /gateway via tailscale serve.
-    return `wss://${host}/gateway`;
+    // We expose the gateway websocket endpoint on a dedicated HTTPS port (8443)
+    // so the path remains `/` (the gateway doesn't expect a prefix).
+    const hostWithoutPort = host.split(":")[0];
+    return `wss://${hostWithoutPort}:8443`;
   }
 
   // Local browsing: keep remote configs as-is, but pin loopback-ish configs to the
