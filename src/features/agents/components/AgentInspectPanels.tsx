@@ -268,9 +268,27 @@ export const AgentSettingsPanel = ({
             />
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <div className="text-[11px] text-muted-foreground">
-                Upload a PNG/JPG. (This stores it locally as an image data file.)
+              <div className="flex items-center gap-2">
+                {avatarDraft.trim().startsWith("data:image/") ? (
+                  <img
+                    src={avatarDraft}
+                    alt="Hacker avatar preview"
+                    className="h-8 w-8 rounded-md border border-border/80 object-cover"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-md border border-border/70 bg-muted/40" />
+                )}
+
+                <button
+                  type="button"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input/90 bg-background/70 text-muted-foreground transition hover:border-border hover:bg-muted/65"
+                  aria-label="Avatar info"
+                  title="Stored locally in studio settings"
+                >
+                  i
+                </button>
               </div>
+
               <button
                 className="rounded-md border border-input/90 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition hover:border-border hover:bg-muted/65 disabled:cursor-not-allowed disabled:opacity-60"
                 type="button"
