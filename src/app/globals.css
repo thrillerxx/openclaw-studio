@@ -313,12 +313,11 @@ textarea:focus::-webkit-scrollbar {
     0 14px 34px -22px color-mix(in oklch, var(--shadow-color) 48%, transparent);
 }
 
-/* iOS (Home Screen / standalone) can fail to open the keyboard for inputs inside backdrop-filter layers. */
-@media (display-mode: standalone) {
-  .glass-panel {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+/* iOS (Home Screen / standalone) can fail to open the keyboard for inputs inside backdrop-filter layers.
+   Prefer JS-driven detection because `@media (display-mode: standalone)` is not consistently honored. */
+:root[data-display-mode="standalone"] .glass-panel {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .fade-up {
