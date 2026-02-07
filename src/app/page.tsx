@@ -2417,6 +2417,50 @@ const AgentStudioPage = () => {
           : "Gateway restart in progress"
       : null;
 
+
+
+  // HackerBot OS: global command bar (v1)
+  const [commandDraft, setCommandDraft] = useState("");
+  const [commandStatusOpen, setCommandStatusOpen] = useState(false);
+
+  const handleCommandSubmit = useCallback(() => {
+    const raw = commandDraft.trim();
+    if (!raw) return;
+
+    if (raw.toLowerCase() === "/status") {
+      setCommandStatusOpen(true);
+      setCommandDraft("");
+      return;
+    }
+
+    const target = focusedAgent;
+    if (!target) {
+      setCommandDraft("");
+      return;
+    }
+
+    const normalized = raw.replace(/^\/kida2\s*/i, "").trim();
+    if (!normalized) {
+      setCommandDraft("");
+      return;
+    }
+
+    handleSend(target.agentId, target.sessionKey, normalized);
+    setCommandDraft("");
+  }, [commandDraft, focusedAgent, handleSend]);
+
+  const handleCommandKeyDown = useCallback(
+    (event: any) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleCommandSubmit();
+      }
+      if (event.key === "Escape") {
+        setCommandStatusOpen(false);
+      }
+    },
+    [handleCommandSubmit]
+  );
   if (status === "connecting" || (status === "connected" && !agentsLoadedOnce)) {
     return (
       <div className="relative min-h-screen w-screen overflow-hidden bg-background">
@@ -2678,7 +2722,82 @@ const AgentStudioPage = () => {
             />
           </div>
 	        )}
-	      </div>
+      </div>
+
+      {/* HackerBot OS command bar (v1) */}
+      <div
+        className="fixed bottom-3 left-0 right-0 z-50 flex justify-center px-3"
+        data-testid="hackerbot-commandbar"
+      >
+        <div className="glass-panel flex w-full max-w-3xl items-center gap-3 px-4 py-3">
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            hbos&gt;
+          </div>
+          <input
+            value={commandDraft}
+            onChange={(event) => setCommandDraft(event.target.value)}
+            onKeyDown={handleCommandKeyDown}
+            placeholder="/kida2 …  |  /status"
+            className="flex-1 bg-transparent font-mono text-[12px] text-foreground outline-none placeholder:text-muted-foreground"
+            aria-label="HackerBot OS command bar"
+          />
+          <button
+            type="button"
+            className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
+            onClick={handleCommandSubmit}
+          >
+            Run
+          </button>
+        </div>
+      </div>
+
+      {commandStatusOpen ? (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-background/70 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Hacker status"
+          onClick={() => setCommandStatusOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl rounded-lg border border-border bg-card/95 p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Hacker status
+                </div>
+                <div className="mt-1 text-base font-semibold text-foreground">Crew</div>
+              </div>
+              <button
+                type="button"
+                className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
+                onClick={() => setCommandStatusOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="mt-4 space-y-2">
+              {filteredAgents.map((agent) => (
+                <div
+                  key={agent.agentId}
+                  className="flex items-center justify-between rounded-md border border-border/70 bg-muted/30 px-3 py-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="font-mono text-[11px] font-semibold text-foreground">{agent.agentId}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                      {agent.status}
+                    </div>
+                  </div>
+                  <div className="font-mono text-[10px] text-muted-foreground">{agent.model}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {createAgentBlock && createAgentBlock.phase !== "queued" ? (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-background/70 backdrop-blur-sm"
