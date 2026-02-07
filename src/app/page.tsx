@@ -2488,7 +2488,7 @@ const AgentStudioPage = () => {
         </div>
       ) : null}
       <div className="relative z-10 flex h-screen flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
-        <div className="w-full">
+        <div className="relative z-30 w-full">
           <HeaderBar
             status={status}
             onConnectionSettings={() => setShowConnectionPanel((prev) => !prev)}
@@ -2500,7 +2500,7 @@ const AgentStudioPage = () => {
 
       {/* HackerBot OS command bar (v1) */}
       <div
-        className="w-full flex justify-center px-1 sm:px-0"
+        className="relative z-10 w-full flex justify-center px-1 sm:px-0"
         data-testid="hackerbot-commandbar"
       >
         <div className="glass-panel flex w-full max-w-3xl items-center gap-3 px-4 py-3">

@@ -1,7 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PaletteToggle } from "@/components/palette-toggle";
 import type { GatewayStatus } from "@/lib/gateway/GatewayClient";
-import { Brain, Ellipsis } from "lucide-react";
+import { Brain, Wrench } from "lucide-react";
 
 type HeaderBarProps = {
   status: GatewayStatus;
@@ -19,7 +19,7 @@ export const HeaderBar = ({
   brainDisabled = false,
 }: HeaderBarProps) => {
   return (
-    <div className="glass-panel fade-up relative overflow-visible px-4 py-2">
+    <div className="glass-panel fade-up relative z-40 overflow-visible px-4 py-2">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,color-mix(in_oklch,var(--primary)_7%,transparent)_48%,transparent_100%)] opacity-55" />
       <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
@@ -40,6 +40,17 @@ export const HeaderBar = ({
           <PaletteToggle />
           <ThemeToggle />
           <button
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input/90 bg-background/75 text-foreground shadow-sm transition hover:border-ring hover:bg-card"
+            type="button"
+            onClick={onConnectionSettings}
+            aria-label="Gateway connection settings"
+            title="Gateway"
+            data-testid="gateway-settings-wrench"
+          >
+            <Wrench className="h-[15px] w-[15px]" />
+          </button>
+
+          <button
             className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition ${
               brainFilesOpen
                 ? "border-border bg-muted text-foreground"
@@ -53,30 +64,6 @@ export const HeaderBar = ({
             <Brain className="h-4 w-4" />
             Brain
           </button>
-          <details className="group relative z-30">
-            <summary
-              className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-md border border-input/80 bg-background/70 text-muted-foreground transition hover:border-ring hover:bg-card hover:text-foreground [&::-webkit-details-marker]:hidden"
-              data-testid="studio-menu-toggle"
-            >
-              <Ellipsis className="h-4 w-4" />
-              <span className="sr-only">Open studio menu</span>
-            </summary>
-            <div className="absolute right-0 top-11 z-20 min-w-44 rounded-md border border-border/80 bg-popover/95 p-1 shadow-lg backdrop-blur">
-              <button
-                className="w-full rounded-sm px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.1em] text-foreground transition hover:bg-muted"
-                type="button"
-                onClick={(event) => {
-                  onConnectionSettings();
-                  (event.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute(
-                    "open"
-                  );
-                }}
-                data-testid="gateway-settings-toggle"
-              >
-                Gateway Connection
-              </button>
-            </div>
-          </details>
         </div>
       </div>
     </div>
