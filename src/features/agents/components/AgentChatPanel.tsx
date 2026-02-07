@@ -420,6 +420,26 @@ export const AgentChatPanel = ({
   const resolvedVariant = effectiveVariant ?? autoVariant;
 
   const scrollToBottomNextOutputRef = useRef(false);
+  const composerWrapRef = useRef<HTMLDivElement | null>(null);
+  const lastOutputLineCountRef = useRef<number>(agent.outputLines.length);
+
+  // Mobile UX: after the hacker replies, keep the composer visible (scroll to bottom).
+  useEffect(() => {
+    if (resolvedVariant !== "mobile") {
+      lastOutputLineCountRef.current = agent.outputLines.length;
+      return;
+    }
+
+    const nextCount = agent.outputLines.length;
+    const prevCount = lastOutputLineCountRef.current;
+    lastOutputLineCountRef.current = nextCount;
+    if (nextCount <= prevCount) return;
+
+    requestAnimationFrame(() => {
+      composerWrapRef.current?.scrollIntoView({ block: "end" });
+    });
+  }, [agent.outputLines.length, resolvedVariant]);
+
   const plainDraftRef = useRef(agent.draft);
   const pendingResizeFrameRef = useRef<number | null>(null);
 
@@ -776,18 +796,20 @@ export const AgentChatPanel = ({
           scrollToBottomNextOutputRef={scrollToBottomNextOutputRef}
         />
 
-        <AgentChatComposer
-          value={draftValue}
-          inputRef={handleDraftRef}
-          onChange={handleComposerChange}
-          onKeyDown={handleComposerKeyDown}
-          onSend={handleComposerSend}
-          onStop={onStopRun}
-          canSend={canSend}
-          stopBusy={stopBusy}
-          running={running}
-          sendDisabled={sendDisabled}
-        />
+        <div ref={composerWrapRef}>
+          <AgentChatComposer
+            value={draftValue}
+            inputRef={handleDraftRef}
+            onChange={handleComposerChange}
+            onKeyDown={handleComposerKeyDown}
+            onSend={handleComposerSend}
+            onStop={onStopRun}
+            canSend={canSend}
+            stopBusy={stopBusy}
+            running={running}
+            sendDisabled={sendDisabled}
+          />
+        </div>
       </div>
     </div>
   );
