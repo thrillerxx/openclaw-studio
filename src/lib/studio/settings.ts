@@ -16,13 +16,17 @@ export type StudioSettings = {
   version: 1;
   gateway: StudioGatewaySettings | null;
   focused: Record<string, StudioFocusedPreference>;
+  /** avatar seed overrides (multiavatar) */
   avatars: Record<string, Record<string, string>>;
+  /** avatar URL overrides (http(s):// or data:image/*) */
+  avatarUrls: Record<string, Record<string, string>>;
 };
 
 export type StudioSettingsPatch = {
   gateway?: StudioGatewaySettings | null;
   focused?: Record<string, Partial<StudioFocusedPreference> | null>;
   avatars?: Record<string, Record<string, string | null> | null>;
+  avatarUrls?: Record<string, Record<string, string | null> | null>;
 };
 
 const SETTINGS_VERSION = 1 as const;
@@ -131,11 +135,39 @@ const normalizeAvatars = (value: unknown): Record<string, Record<string, string>
   return avatars;
 };
 
+const normalizeAvatarUrls = (value: unknown): Record<string, Record<string, string>> => {
+  if (!isRecord(value)) return {};
+  const avatarUrls: Record<string, Record<string, string>> = {};
+  for (const [gatewayKeyRaw, gatewayRaw] of Object.entries(value)) {
+    const gatewayKey = normalizeGatewayKey(gatewayKeyRaw);
+    if (!gatewayKey) continue;
+    if (!isRecord(gatewayRaw)) continue;
+    const entries: Record<string, string> = {};
+    for (const [agentIdRaw, urlRaw] of Object.entries(gatewayRaw)) {
+      const agentId = coerceString(agentIdRaw);
+      if (!agentId) continue;
+      const url = coerceString(urlRaw);
+      if (!url) continue;
+      // only allow safe image URLs / data URIs
+      if (
+        url.startsWith("https://") ||
+        url.startsWith("http://") ||
+        url.startsWith("data:image/")
+      ) {
+        entries[agentId] = url;
+      }
+    }
+    avatarUrls[gatewayKey] = entries;
+  }
+  return avatarUrls;
+};
+
 export const defaultStudioSettings = (): StudioSettings => ({
   version: SETTINGS_VERSION,
   gateway: null,
   focused: {},
   avatars: {},
+  avatarUrls: {},
 });
 
 export const normalizeStudioSettings = (raw: unknown): StudioSettings => {
@@ -143,11 +175,13 @@ export const normalizeStudioSettings = (raw: unknown): StudioSettings => {
   const gateway = normalizeGatewaySettings(raw.gateway);
   const focused = normalizeFocused(raw.focused);
   const avatars = normalizeAvatars(raw.avatars);
+  const avatarUrls = normalizeAvatarUrls(raw.avatarUrls);
   return {
     version: SETTINGS_VERSION,
     gateway,
     focused,
     avatars,
+    avatarUrls,
   };
 };
 
@@ -159,6 +193,7 @@ export const mergeStudioSettings = (
     patch.gateway === undefined ? current.gateway : normalizeGatewaySettings(patch.gateway);
   const nextFocused = { ...current.focused };
   const nextAvatars = { ...current.avatars };
+  const nextAvatarUrls = { ...current.avatarUrls };
   if (patch.focused) {
     for (const [keyRaw, value] of Object.entries(patch.focused)) {
       const key = normalizeGatewayKey(keyRaw);
@@ -198,11 +233,51 @@ export const mergeStudioSettings = (
       nextAvatars[gatewayKey] = existing;
     }
   }
+
+  if (patch.avatarUrls) {
+    for (const [gatewayKeyRaw, gatewayPatch] of Object.entries(patch.avatarUrls)) {
+      const gatewayKey = normalizeGatewayKey(gatewayKeyRaw);
+      if (!gatewayKey) continue;
+      if (gatewayPatch === null) {
+        delete nextAvatarUrls[gatewayKey];
+        continue;
+      }
+      if (!isRecord(gatewayPatch)) continue;
+      const existing = nextAvatarUrls[gatewayKey]
+        ? { ...nextAvatarUrls[gatewayKey] }
+        : {};
+      for (const [agentIdRaw, urlPatchRaw] of Object.entries(gatewayPatch)) {
+        const agentId = coerceString(agentIdRaw);
+        if (!agentId) continue;
+        if (urlPatchRaw === null) {
+          delete existing[agentId];
+          continue;
+        }
+        const url = coerceString(urlPatchRaw);
+        if (!url) {
+          delete existing[agentId];
+          continue;
+        }
+        if (
+          url.startsWith("https://") ||
+          url.startsWith("http://") ||
+          url.startsWith("data:image/")
+        ) {
+          existing[agentId] = url;
+        } else {
+          delete existing[agentId];
+        }
+      }
+      nextAvatarUrls[gatewayKey] = existing;
+    }
+  }
+
   return {
     version: SETTINGS_VERSION,
     gateway: nextGateway ?? null,
     focused: nextFocused,
     avatars: nextAvatars,
+    avatarUrls: nextAvatarUrls,
   };
 };
 
@@ -225,4 +300,16 @@ export const resolveAgentAvatarSeed = (
   const agentKey = coerceString(agentId);
   if (!agentKey) return null;
   return settings.avatars[gatewayKey]?.[agentKey] ?? null;
+};
+
+export const resolveAgentAvatarUrlOverride = (
+  settings: StudioSettings,
+  gatewayUrl: string,
+  agentId: string
+): string | null => {
+  const gatewayKey = normalizeGatewayKey(gatewayUrl);
+  if (!gatewayKey) return null;
+  const agentKey = coerceString(agentId);
+  if (!agentKey) return null;
+  return settings.avatarUrls[gatewayKey]?.[agentKey] ?? null;
 };

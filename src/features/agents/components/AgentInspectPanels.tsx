@@ -55,6 +55,7 @@ type AgentSettingsPanelProps = {
   agent: AgentState;
   onClose: () => void;
   onRename: (value: string) => Promise<boolean>;
+  onAvatarSet?: (avatarUrl: string | null) => Promise<void> | void;
   onNewSession: () => Promise<void> | void;
   onDelete: () => void;
   canDelete?: boolean;
@@ -89,6 +90,7 @@ export const AgentSettingsPanel = ({
   agent,
   onClose,
   onRename,
+  onAvatarSet = () => {},
   onNewSession,
   onDelete,
   canDelete = true,
@@ -114,10 +116,50 @@ export const AgentSettingsPanel = ({
   const [renameError, setRenameError] = useState<string | null>(null);
   const [sessionBusy, setSessionBusy] = useState(false);
 
+  const [avatarDraft, setAvatarDraft] = useState(agent.avatarUrl ?? "");
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
   useEffect(() => {
     setNameDraft(agent.name);
     setRenameError(null);
   }, [agent.agentId, agent.name]);
+
+  useEffect(() => {
+    setAvatarDraft(agent.avatarUrl ?? "");
+    setAvatarError(null);
+    setAvatarSaving(false);
+  }, [agent.agentId, agent.avatarUrl]);
+
+  const handleSaveAvatar = async (nextRaw: string) => {
+    const next = nextRaw.trim();
+    if (!next) {
+      setAvatarSaving(true);
+      setAvatarError(null);
+      try {
+        await onAvatarSet(null);
+      } finally {
+        setAvatarSaving(false);
+      }
+      return;
+    }
+    if (
+      !next.startsWith("http://") &&
+      !next.startsWith("https://") &&
+      !next.startsWith("data:image/")
+    ) {
+      setAvatarError("Avatar must be an https:// URL or an image data URL.");
+      return;
+    }
+
+    setAvatarSaving(true);
+    setAvatarError(null);
+    try {
+      await onAvatarSet(next);
+    } finally {
+      setAvatarSaving(false);
+    }
+  };
 
   const handleRename = async () => {
     const next = nameDraft.trim();
@@ -199,6 +241,71 @@ export const AgentSettingsPanel = ({
             >
               {renameSaving ? "Saving..." : "Update Name"}
             </button>
+          </div>
+
+          <div className="mt-4 border-t border-border/70 pt-4">
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Avatar
+            </div>
+
+            <label className="mt-3 flex flex-col gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <span>Hacker avatar URL</span>
+              <input
+                aria-label="Hacker avatar URL"
+                className="h-10 rounded-md border border-border bg-card/75 px-3 text-xs font-semibold text-foreground outline-none"
+                value={avatarDraft}
+                disabled={avatarSaving}
+                onChange={(event) => setAvatarDraft(event.target.value)}
+                placeholder="https://… (or paste data:image/…)"
+                spellCheck={false}
+              />
+            </label>
+
+            <label className="mt-3 flex flex-col gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              <span>Upload image</span>
+              <input
+                aria-label="Upload hacker avatar"
+                type="file"
+                accept="image/*"
+                disabled={avatarSaving}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0] ?? null;
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const result = typeof reader.result === "string" ? reader.result : "";
+                    setAvatarDraft(result);
+                    void handleSaveAvatar(result);
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+
+            {avatarError ? (
+              <div className="mt-3 rounded-md border border-destructive bg-destructive px-3 py-2 text-xs text-destructive-foreground">
+                {avatarError}
+              </div>
+            ) : null}
+
+            <div className="mt-3 flex items-center justify-end gap-2">
+              <button
+                className="rounded-md border border-border/80 bg-card/75 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-70"
+                type="button"
+                onClick={() => void handleSaveAvatar("")}
+                disabled={avatarSaving}
+              >
+                Clear
+              </button>
+              <button
+                className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+                type="button"
+                onClick={() => void handleSaveAvatar(avatarDraft)}
+                disabled={avatarSaving}
+              >
+                {avatarSaving ? "Saving..." : "Save Avatar"}
+              </button>
+            </div>
           </div>
         </section>
 

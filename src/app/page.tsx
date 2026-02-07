@@ -84,7 +84,11 @@ import {
 } from "@/lib/gateway/sessionKeys";
 import { buildAvatarDataUrl } from "@/lib/avatars/multiavatar";
 import { getStudioSettingsCoordinator } from "@/lib/studio/coordinator";
-import { resolveAgentAvatarSeed, resolveFocusedPreference } from "@/lib/studio/settings";
+import {
+  resolveAgentAvatarSeed,
+  resolveAgentAvatarUrlOverride,
+  resolveFocusedPreference,
+} from "@/lib/studio/settings";
 import { applySessionSettingMutation } from "@/features/agents/state/sessionSettingsMutations";
 import {
   isGatewayDisconnectLikeError,
@@ -790,7 +794,11 @@ const AgentStudioPage = () => {
         const persistedSeed =
           settings && gatewayKey ? resolveAgentAvatarSeed(settings, gatewayKey, agent.id) : null;
         const avatarSeed = persistedSeed ?? agent.id;
-        const avatarUrl = resolveAgentAvatarUrl(agent);
+        const persistedAvatarUrl =
+          settings && gatewayKey
+            ? resolveAgentAvatarUrlOverride(settings, gatewayKey, agent.id)
+            : null;
+        const avatarUrl = persistedAvatarUrl ?? resolveAgentAvatarUrl(agent);
         const name = resolveAgentName(agent);
         return {
           agentId: agent.id,
@@ -2346,6 +2354,29 @@ const AgentStudioPage = () => {
     [dispatch, gatewayUrl, settingsCoordinator]
   );
 
+  const handleAvatarSet = useCallback(
+    async (agentId: string, avatarUrl: string | null) => {
+      dispatch({
+        type: "updateAgent",
+        agentId,
+        patch: { avatarUrl },
+      });
+      const key = gatewayUrl.trim();
+      if (!key) return;
+      settingsCoordinator.schedulePatch(
+        {
+          avatarUrls: {
+            [key]: {
+              [agentId]: avatarUrl,
+            },
+          },
+        },
+        0
+      );
+    },
+    [dispatch, gatewayUrl, settingsCoordinator]
+  );
+
   const handleDraftChange = useCallback(
     (agentId: string, value: string) => {
       pendingDraftValuesRef.current.set(agentId, value);
@@ -2721,6 +2752,7 @@ const AgentStudioPage = () => {
                   onThinkingTracesToggle={(enabled) =>
                     handleThinkingTracesToggle(settingsAgent.agentId, enabled)
                   }
+                  onAvatarSet={(avatarUrl) => handleAvatarSet(settingsAgent.agentId, avatarUrl)}
                   cronJobs={settingsCronJobs}
                   cronLoading={settingsCronLoading}
                   cronError={settingsCronError}

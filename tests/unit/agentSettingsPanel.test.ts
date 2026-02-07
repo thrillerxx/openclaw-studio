@@ -78,6 +78,7 @@ describe("AgentSettingsPanel", () => {
         agent: createAgent(),
         onClose: vi.fn(),
         onRename,
+        onAvatarSet: vi.fn(),
         onNewSession: vi.fn(),
         onDelete: vi.fn(),
         onToolCallingToggle: vi.fn(),
