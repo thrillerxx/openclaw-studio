@@ -2571,7 +2571,7 @@ const AgentStudioPage = () => {
                   }`}
                   onClick={() => setMobilePane("fleet")}
                 >
-                  Fleet
+                  Collective
                 </button>
                 <button
                   type="button"
@@ -2741,7 +2741,7 @@ const AgentStudioPage = () => {
         ) : (
           <div className="glass-panel fade-up-delay flex min-h-0 flex-1 flex-col overflow-hidden p-5 sm:p-6">
             <EmptyStatePanel
-              label="Fleet"
+              label="Collective"
               title="No hackers available"
               description="Connect to your gateway to load agents into the studio."
               detail={gatewayUrl || "Gateway URL is empty"}
