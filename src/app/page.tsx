@@ -2498,6 +2498,34 @@ const AgentStudioPage = () => {
           />
         </div>
 
+      {/* HackerBot OS command bar (v1) */}
+      <div
+        className="w-full flex justify-center px-1 sm:px-0"
+        data-testid="hackerbot-commandbar"
+      >
+        <div className="glass-panel flex w-full max-w-3xl items-center gap-3 px-4 py-3">
+          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            hbos&gt;
+          </div>
+          <input
+            value={commandDraft}
+            onChange={(event) => setCommandDraft(event.target.value)}
+            onKeyDown={handleCommandKeyDown}
+            placeholder="/kida2 …  |  /status"
+            className="flex-1 bg-transparent font-mono text-[12px] text-foreground outline-none placeholder:text-muted-foreground"
+            aria-label="HackerBot OS command bar"
+          />
+          <button
+            type="button"
+            className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
+            onClick={handleCommandSubmit}
+          >
+            Run
+          </button>
+        </div>
+      </div>
+
+
         {connectionPanelVisible ? (
           <div className="w-full">
             <div className="glass-panel px-4 py-4 sm:px-6 sm:py-6">
@@ -2722,33 +2750,6 @@ const AgentStudioPage = () => {
             />
           </div>
 	        )}
-      </div>
-
-      {/* HackerBot OS command bar (v1) */}
-      <div
-        className="fixed bottom-3 left-0 right-0 z-50 flex justify-center px-3"
-        data-testid="hackerbot-commandbar"
-      >
-        <div className="glass-panel flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            hbos&gt;
-          </div>
-          <input
-            value={commandDraft}
-            onChange={(event) => setCommandDraft(event.target.value)}
-            onKeyDown={handleCommandKeyDown}
-            placeholder="/kida2 …  |  /status"
-            className="flex-1 bg-transparent font-mono text-[12px] text-foreground outline-none placeholder:text-muted-foreground"
-            aria-label="HackerBot OS command bar"
-          />
-          <button
-            type="button"
-            className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
-            onClick={handleCommandSubmit}
-          >
-            Run
-          </button>
-        </div>
       </div>
 
       {commandStatusOpen ? (
