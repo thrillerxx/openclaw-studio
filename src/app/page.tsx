@@ -280,6 +280,10 @@ const AgentStudioPage = () => {
   const [settingsCoordinator] = useState(() => getStudioSettingsCoordinator());
   const [isXlLayout, setIsXlLayout] = useState(true);
 
+  const [pwaInstallHelpOpen, setPwaInstallHelpOpen] = useState(false);
+  const [isIosBrowserMode, setIsIosBrowserMode] = useState(false);
+  const [isStandaloneMode, setIsStandaloneMode] = useState(false);
+
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
     const mq = window.matchMedia("(min-width: 1280px)");
@@ -287,6 +291,21 @@ const AgentStudioPage = () => {
     apply();
     mq.addEventListener?.("change", apply);
     return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ua = navigator.userAgent ?? "";
+    const isiOS = /iP(hone|ad|od)/.test(ua);
+    const standalone =
+      (typeof window.matchMedia === "function" &&
+        window.matchMedia("(display-mode: standalone)").matches) ||
+      // iOS Safari
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Boolean((navigator as any).standalone);
+
+    setIsStandaloneMode(standalone);
+    setIsIosBrowserMode(isiOS && !standalone);
   }, []);
 
   const {
@@ -2534,6 +2553,69 @@ const AgentStudioPage = () => {
 
   return (
     <div className="relative min-h-[100dvh] w-screen overflow-hidden bg-background">
+      {isIosBrowserMode ? (
+        <div className="fixed bottom-3 left-0 right-0 z-[80] flex justify-center px-3">
+          <div className="glass-panel w-full max-w-md px-4 py-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Install HBOS
+                </div>
+                <div className="mt-1 text-xs text-foreground">
+                  Add to Home Screen for the best iPhone experience.
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  className="rounded-md border border-border/80 bg-card/75 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                  onClick={() => setPwaInstallHelpOpen(true)}
+                >
+                  How
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {pwaInstallHelpOpen ? (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-background/60 px-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Install HackerBot OS"
+          onClick={() => setPwaInstallHelpOpen(false)}
+        >
+          <div
+            className="glass-panel w-full max-w-sm border border-border/80 px-5 py-4"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Install HackerBot OS
+            </div>
+            <div className="mt-2 text-sm text-foreground">
+              <ol className="list-decimal space-y-1 pl-5">
+                <li>Open this page in Safari.</li>
+                <li>Tap the Share button.</li>
+                <li>Tap “Add to Home Screen”.</li>
+              </ol>
+              <div className="mt-3 text-xs text-muted-foreground">
+                Tip: after install, launch from the HBOS icon for a cleaner, app-like feel.
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                className="rounded-md border border-border/80 bg-card/75 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                onClick={() => setPwaInstallHelpOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
           <div className="glass-panel loading-toast px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
