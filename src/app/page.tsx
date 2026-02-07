@@ -2553,8 +2553,8 @@ const AgentStudioPage = () => {
         className="relative z-10 w-full flex justify-center px-1 sm:px-0"
         data-testid="hackerbot-commandbar"
       >
-        <div className="glass-panel flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        <div className="glass-panel flex w-full max-w-3xl items-center gap-2 px-4 py-2">
+          <div className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             hbos&gt;
           </div>
           <input
@@ -2570,7 +2570,7 @@ const AgentStudioPage = () => {
           />
           <button
             type="button"
-            className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
+            className="h-10 shrink-0 rounded-md border border-border/80 bg-card/70 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
             onClick={handleCommandSubmit}
           >
             Run
