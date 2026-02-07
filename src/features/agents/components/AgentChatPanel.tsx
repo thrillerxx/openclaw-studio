@@ -31,6 +31,12 @@ type AgentChatPanelProps = {
   canSend: boolean;
   models: GatewayModelChoice[];
   stopBusy: boolean;
+  /**
+   * auto = switches based on viewport (xl+ => full, else mobile)
+   * full = current Studio panel
+   * mobile = compact, chat-first layout
+   */
+  variant?: "auto" | "full" | "mobile";
   onOpenSettings: () => void;
   onModelChange: (value: string | null) => void;
   onThinkingChange: (value: string | null) => void;
@@ -388,6 +394,7 @@ export const AgentChatPanel = ({
   canSend,
   models,
   stopBusy,
+  variant = "auto",
   onOpenSettings,
   onModelChange,
   onThinkingChange,
@@ -398,6 +405,20 @@ export const AgentChatPanel = ({
 }: AgentChatPanelProps) => {
   const [draftValue, setDraftValue] = useState(agent.draft);
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [autoVariant, setAutoVariant] = useState<"full" | "mobile">("full");
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const apply = () => setAutoVariant(mq.matches ? "full" : "mobile");
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  const effectiveVariant = variant === "auto" ? autoVariant : variant;
+  const resolvedVariant = effectiveVariant ?? autoVariant;
+
   const scrollToBottomNextOutputRef = useRef(false);
   const plainDraftRef = useRef(agent.draft);
   const pendingResizeFrameRef = useRef<number | null>(null);
@@ -601,7 +622,38 @@ export const AgentChatPanel = ({
   return (
     <div data-agent-panel className="group fade-up relative flex h-full w-full flex-col">
       <div className="px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="flex items-start justify-between gap-4">
+        {resolvedVariant === "mobile" ? (
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <AgentAvatar
+                seed={avatarSeed}
+                name={agent.name}
+                avatarUrl={agent.avatarUrl ?? null}
+                size={28}
+                isSelected={isSelected}
+              />
+              <div className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
+                {agent.name}
+              </div>
+              <span
+                className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] ${statusColor}`}
+              >
+                {statusLabel}
+              </span>
+            </div>
+            <button
+              className="nodrag flex h-9 w-9 items-center justify-center rounded-md border border-border/80 bg-card/60 text-muted-foreground transition hover:border-border hover:bg-muted/65"
+              type="button"
+              data-testid="agent-settings-toggle"
+              aria-label="Open hacker settings"
+              title="Hacker settings"
+              onClick={onOpenSettings}
+            >
+              <Cog className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
             <div className="group/avatar relative">
               <AgentAvatar
@@ -702,6 +754,7 @@ export const AgentChatPanel = ({
             <Cog className="h-4 w-4" />
           </button>
         </div>
+        )}
       </div>
 
       <div className="mt-3 flex min-h-0 flex-1 flex-col gap-3 px-3 pb-3 sm:px-4 sm:pb-4">
