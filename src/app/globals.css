@@ -95,8 +95,33 @@
 }
 
 /* Palette: terminal (black/green) */
-:root[data-palette="terminal"],
+:root[data-palette="terminal"] {
+  /* “light” terminal = bright background so the theme toggle is visible */
+  --background: oklch(0.97 0.01 145);
+  --foreground: oklch(0.28 0.10 145);
+  --card: oklch(0.995 0.006 145 / 0.92);
+  --card-foreground: oklch(0.28 0.10 145);
+  --popover: oklch(0.995 0.006 145);
+  --popover-foreground: oklch(0.28 0.10 145);
+  --primary: oklch(0.56 0.22 145);
+  --primary-foreground: oklch(0.98 0.01 145);
+  --secondary: oklch(0.93 0.02 145);
+  --secondary-foreground: oklch(0.30 0.10 145);
+  --muted: oklch(0.94 0.015 145);
+  --muted-foreground: oklch(0.40 0.08 145);
+  --accent: oklch(0.88 0.05 145);
+  --accent-foreground: oklch(0.28 0.10 145);
+  --border: oklch(0.70 0.05 145 / 0.55);
+  --input: oklch(0.94 0.02 145);
+  --ring: oklch(0.56 0.22 145);
+  --panel: oklch(0.99 0.01 145 / 0.75);
+  --panel-border: oklch(0.70 0.05 145 / 0.45);
+  --shadow-color: oklch(0.20 0.02 145);
+  --shadow-opacity: 0.22;
+}
+
 :root[data-palette="terminal"].dark {
+  /* “dark” terminal = classic black/green */
   --background: oklch(0.12 0 0);
   --foreground: oklch(0.92 0.08 145);
   --card: oklch(0.16 0 0 / 0.92);
