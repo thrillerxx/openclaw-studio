@@ -2515,7 +2515,7 @@ const AgentStudioPage = () => {
     return (
       <div className="relative min-h-[100dvh] w-screen overflow-hidden bg-background">
         <div className="flex min-h-[100dvh] items-center justify-center px-6">
-          <div className="glass-panel w-full max-w-md px-6 py-6 text-center">
+          <div className="glass-panel loading-panel w-full max-w-md px-6 py-6 text-center">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               HackerBot OS
             </div>
@@ -2535,7 +2535,7 @@ const AgentStudioPage = () => {
     <div className="relative min-h-[100dvh] w-screen overflow-hidden bg-background">
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
-          <div className="glass-panel px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="glass-panel loading-toast px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
             <div>Loading hackers…</div>
             <div className="mt-2 h-1 w-full overflow-hidden rounded-full border border-border/70 bg-muted/40">
               <div className="h-full w-1/3 rounded-full bg-primary/70 loading-bar" />

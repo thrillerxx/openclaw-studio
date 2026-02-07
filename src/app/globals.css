@@ -360,6 +360,49 @@ textarea:focus::-webkit-scrollbar {
   will-change: transform;
 }
 
+/* Make the loading UI feel “glassy” even when iOS disables blur. */
+.loading-panel,
+.loading-toast {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-panel::before,
+.loading-toast::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      900px 220px at 20% 10%,
+      color-mix(in oklch, var(--primary) 14%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 220px at 80% 0%,
+      color-mix(in oklch, var(--accent) 10%, transparent),
+      transparent 55%
+    );
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.loading-panel::after,
+.loading-toast::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, white 10%, transparent),
+    transparent 24%,
+    transparent 72%,
+    color-mix(in oklch, black 16%, transparent)
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .agent-avatar-selected {
   box-shadow:
     0 0 0 2px color-mix(in oklch, var(--primary) 26%, transparent),
