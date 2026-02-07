@@ -358,7 +358,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
         className="flex-1 resize-none rounded-md border border-border/80 bg-card/75 px-3 py-2 text-[11px] text-foreground outline-none transition focus:border-ring"
         onChange={onChange}
         onKeyDown={onKeyDown}
-        placeholder="type a message"
+        placeholder="/kida2 … (or type a message)"
       />
       {running ? (
         <button
@@ -442,8 +442,17 @@ export const AgentChatPanel = ({
       if (!canSend || agent.status === "running") return;
       const trimmed = message.trim();
       if (!trimmed) return;
+
+      // HackerBot OS command aliases (v1)
+      // `/kida2 <msg>` acts as a shorthand for sending `<msg>` to the currently focused agent.
+      // (Future: route to named agents, /status, /newhacker, etc.)
+      const normalized = trimmed.toLowerCase().startsWith("/kida2")
+        ? trimmed.replace(/^\/kida2\b\s*/i, "")
+        : trimmed;
+
+      if (!normalized.trim()) return;
       scrollToBottomNextOutputRef.current = true;
-      onSend(trimmed);
+      onSend(normalized.trim());
     },
     [agent.status, canSend, onSend]
   );
