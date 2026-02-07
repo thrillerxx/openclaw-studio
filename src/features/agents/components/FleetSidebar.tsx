@@ -37,6 +37,12 @@ const statusClassName: Record<AgentState["status"], string> = {
   error: "border border-destructive/35 bg-destructive/12 text-destructive",
 };
 
+const statusDotClassName: Record<AgentState["status"], string> = {
+  idle: "bg-muted-foreground/70",
+  running: "bg-primary",
+  error: "bg-destructive",
+};
+
 export const FleetSidebar = ({
   agents,
   selectedAgentId,
@@ -121,8 +127,12 @@ export const FleetSidebar = ({
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-2">
                       <span
-                        className={`rounded px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] ${statusClassName[agent.status]}`}
+                        className={`inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] ${statusClassName[agent.status]}`}
                       >
+                        <span
+                          aria-hidden
+                          className={`h-1.5 w-1.5 rounded-full ${statusDotClassName[agent.status]}`}
+                        />
                         {statusLabel[agent.status]}
                       </span>
                       {attention === "needs-attention" ? (

@@ -533,10 +533,17 @@ export const AgentChatPanel = ({
         : "border border-border/70 bg-muted text-muted-foreground";
   const statusLabel =
     agent.status === "running"
-      ? "Running"
+      ? "Active"
       : agent.status === "error"
         ? "Error"
         : "Idle";
+
+  const statusDotClassName =
+    agent.status === "running"
+      ? "bg-primary"
+      : agent.status === "error"
+        ? "bg-destructive"
+        : "bg-muted-foreground/70";
 
   const chatItems = useMemo(
     () =>
@@ -683,8 +690,9 @@ export const AgentChatPanel = ({
                 {agent.name}
               </div>
               <span
-                className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] ${statusColor}`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] ${statusColor}`}
               >
+                <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${statusDotClassName}`} />
                 {statusLabel}
               </span>
             </div>
@@ -734,8 +742,9 @@ export const AgentChatPanel = ({
                   •
                 </span>
                 <span
-                  className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] ${statusColor}`}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] ${statusColor}`}
                 >
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${statusDotClassName}`} />
                   {statusLabel}
                 </span>
               </div>
