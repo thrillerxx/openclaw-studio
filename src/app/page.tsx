@@ -2487,7 +2487,7 @@ const AgentStudioPage = () => {
           </div>
         </div>
       ) : null}
-      <div className="relative z-10 flex h-screen flex-col gap-4 px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
+      <div className="relative z-10 flex h-screen flex-col gap-4 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
         <div className="relative z-30 w-full">
           <HeaderBar
             status={status}
