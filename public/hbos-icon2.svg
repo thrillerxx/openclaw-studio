@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HackerBot OS globe icon">
+  <defs>
+    <clipPath id="clipCircle">
+      <circle cx="256" cy="256" r="236"/>
+    </clipPath>
+    <style>
+      .k { fill: #000; }
+      .w { fill: #fff; }
+      .strokeW { stroke: #fff; stroke-width: 18; }
+    </style>
+  </defs>
+
+  <!-- Outer sticker ring (white border) -->
+  <circle cx="256" cy="256" r="244" class="w"/>
+  <circle cx="256" cy="256" r="236" class="k"/>
+
+  <!-- Globe grid + band clipped to circle -->
+  <g clip-path="url(#clipCircle)">
+    <!-- Horizontal band behind letters -->
+    <rect x="0" y="188" width="512" height="136" class="w"/>
+
+    <!-- Latitude cutouts (top) -->
+    <g class="w" opacity="1">
+      <rect x="110" y="72" width="92" height="34" rx="6"/>
+      <rect x="210" y="58" width="92" height="34" rx="6"/>
+      <rect x="310" y="72" width="92" height="34" rx="6"/>
+
+      <rect x="96" y="124" width="110" height="38" rx="6"/>
+      <rect x="230" y="124" width="110" height="38" rx="6"/>
+      <rect x="364" y="124" width="110" height="38" rx="6"/>
+    </g>
+
+    <!-- Latitude cutouts (bottom) -->
+    <g class="w">
+      <rect x="96" y="350" width="110" height="38" rx="6"/>
+      <rect x="230" y="350" width="110" height="38" rx="6"/>
+      <rect x="364" y="350" width="110" height="38" rx="6"/>
+
+      <rect x="110" y="406" width="92" height="34" rx="6"/>
+      <rect x="210" y="420" width="92" height="34" rx="6"/>
+      <rect x="310" y="406" width="92" height="34" rx="6"/>
+    </g>
+
+    <!-- Vertical meridian cutouts -->
+    <g class="w" opacity="1">
+      <rect x="250" y="18" width="12" height="476" rx="6"/>
+      <rect x="168" y="36" width="10" height="440" rx="5" opacity="0.75"/>
+      <rect x="334" y="36" width="10" height="440" rx="5" opacity="0.75"/>
+    </g>
+
+    <!-- Wordmark: HBOS (pixel-ish) -->
+    <g transform="translate(78 202)" fill="#000">
+      <!-- H -->
+      <path d="M0,0 h46 v108 h-46 z M0,46 h90 v20 h-90 z M90,0 h46 v108 h-46 z" />
+      <!-- B -->
+      <path d="M160,0 h78 q34,0 34,28 q0,16-12,24 q16,8 16,28 q0,28-34,28 h-82 z
+               M206,18 h20 q16,0 16,12 q0,12-16,12 h-20 z
+               M206,62 h26 q16,0 16,13 q0,13-16,13 h-26 z" />
+      <!-- O -->
+      <path d="M300,8 q0-8 8-8 h86 q8,0 8,8 v92 q0,8-8,8 h-86 q-8,0-8-8 z
+               M332,28 h40 v52 h-40 z" />
+      <!-- S (blocky, stepped) -->
+      <path d="M420,0 h100 v20 h-70 v22 h52 q18,0 18,18 v32 q0,16-18,16 h-82 v-20 h70 v-22 h-52 q-18,0-18-18 v-32 q0-16 18-16 h82 z" />
+    </g>
+  </g>
+</svg>
