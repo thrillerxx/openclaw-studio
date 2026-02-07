@@ -2560,7 +2560,7 @@ const AgentStudioPage = () => {
         data-testid="hackerbot-commandbar"
       >
         <div className="glass-panel flex w-full max-w-3xl items-center gap-2 px-4 py-2">
-          <div className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="shrink-0 font-mono text-[13px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:text-[12px] sm:tracking-[0.16em]">
             hbos&gt;
           </div>
           <div className="relative flex-1">
@@ -2572,7 +2572,7 @@ const AgentStudioPage = () => {
               inputMode="text"
               enterKeyHint="go"
               style={{ touchAction: "manipulation" }}
-              className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 pr-[84px] font-mono text-[16px] leading-5 text-foreground outline-none transition focus:border-ring placeholder:text-muted-foreground sm:border-transparent sm:bg-transparent sm:pr-0 sm:text-[12px] sm:leading-normal"
+              className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 pr-[84px] font-mono text-[14px] leading-5 text-foreground outline-none transition focus:border-ring placeholder:text-muted-foreground sm:border-transparent sm:bg-transparent sm:pr-0 sm:text-[12px] sm:leading-normal"
               aria-label="HackerBot OS command bar"
             />
             <button
