@@ -119,6 +119,7 @@ export const AgentSettingsPanel = ({
   const [avatarDraft, setAvatarDraft] = useState(agent.avatarUrl ?? "");
   const [avatarSaving, setAvatarSaving] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [avatarInfoOpen, setAvatarInfoOpen] = useState(false);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -293,12 +294,7 @@ export const AgentSettingsPanel = ({
                   type="button"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input/90 bg-background/70 text-muted-foreground transition hover:border-border hover:bg-muted/65"
                   aria-label="Hacker avatar info"
-                  onClick={() => {
-                    // iOS/PWA: `title` tooltips don't reliably show.
-                    window.alert(
-                      "Hacker avatars are stored locally in your Studio settings (this device/browser)."
-                    );
-                  }}
+                  onClick={() => setAvatarInfoOpen(true)}
                 >
                   i
                 </button>
@@ -329,6 +325,37 @@ export const AgentSettingsPanel = ({
                 {avatarSaving ? "Saving..." : "Save"}
               </button>
             </div>
+
+            {avatarInfoOpen ? (
+              <div
+                className="fixed inset-0 z-[90] flex items-center justify-center bg-background/60 px-6"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Hacker avatar info"
+                onClick={() => setAvatarInfoOpen(false)}
+              >
+                <div
+                  className="glass-panel w-full max-w-sm border border-border/80 px-5 py-4"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Avatar storage
+                  </div>
+                  <div className="mt-2 text-sm text-foreground">
+                    Hacker avatars are stored locally in your Studio settings (this device/browser).
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      type="button"
+                      className="rounded-md border border-border/80 bg-card/75 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                      onClick={() => setAvatarInfoOpen(false)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </section>
 
