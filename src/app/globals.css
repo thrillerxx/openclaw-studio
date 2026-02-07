@@ -315,7 +315,7 @@ textarea:focus::-webkit-scrollbar {
 
 /* iOS (Home Screen / standalone) can fail to open the keyboard for inputs inside backdrop-filter layers.
    Prefer JS-driven detection because `@media (display-mode: standalone)` is not consistently honored. */
-:root[data-display-mode="standalone"] .glass-panel {
+:root[data-platform="ios"] .glass-panel {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
