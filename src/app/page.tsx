@@ -2564,7 +2564,7 @@ const AgentStudioPage = () => {
               <div className="grid grid-cols-4 gap-2">
                 <button
                   type="button"
-                  className={`rounded-md border px-2 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
+                  className={`rounded-md border px-2 py-2 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.10em] transition sm:text-[10px] ${
                     mobilePane === "fleet"
                       ? "border-border bg-muted text-foreground shadow-xs"
                       : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
@@ -2575,7 +2575,7 @@ const AgentStudioPage = () => {
                 </button>
                 <button
                   type="button"
-                  className={`rounded-md border px-2 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
+                  className={`rounded-md border px-2 py-2 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.10em] transition sm:text-[10px] ${
                     mobilePane === "chat"
                       ? "border-border bg-muted text-foreground shadow-xs"
                       : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
@@ -2586,7 +2586,7 @@ const AgentStudioPage = () => {
                 </button>
                 <button
                   type="button"
-                  className={`rounded-md border px-2 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
+                  className={`rounded-md border px-2 py-2 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.10em] transition sm:text-[10px] ${
                     mobilePane === "settings"
                       ? "border-border bg-muted text-foreground shadow-xs"
                       : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
@@ -2598,7 +2598,7 @@ const AgentStudioPage = () => {
                 </button>
                 <button
                   type="button"
-                  className={`rounded-md border px-2 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] transition ${
+                  className={`rounded-md border px-2 py-2 text-center font-mono text-[9px] font-semibold uppercase tracking-[0.10em] transition sm:text-[10px] ${
                     mobilePane === "brain"
                       ? "border-border bg-muted text-foreground shadow-xs"
                       : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
