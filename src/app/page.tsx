@@ -259,7 +259,7 @@ const findAgentByRunId = (agents: AgentState[], runId: string): string | null =>
 };
 
 const resolveNextNewAgentName = (agents: AgentState[]) => {
-  const baseName = "New Agent";
+  const baseName = "New Hacker";
   const existing = new Set(
     agents.map((agent) => agent.name.trim().toLowerCase()).filter((name) => name.length > 0)
   );
@@ -2669,11 +2669,11 @@ const AgentStudioPage = () => {
                 />
               ) : (
                 <EmptyStatePanel
-                  title={hasAnyAgents ? "No agents match this filter." : "No agents available."}
+                  title={hasAnyAgents ? "No hackers match this filter." : "No hackers available."}
                   description={
                     hasAnyAgents
                       ? undefined
-                      : "Use New Agent in the sidebar to add your first agent."
+                      : "Use New Hacker in the sidebar to add your first hacker."
                   }
                   fillHeight
                   className="items-center p-6 text-center text-sm"
@@ -2742,7 +2742,7 @@ const AgentStudioPage = () => {
           <div className="glass-panel fade-up-delay flex min-h-0 flex-1 flex-col overflow-hidden p-5 sm:p-6">
             <EmptyStatePanel
               label="Fleet"
-              title="No agents available"
+              title="No hackers available"
               description="Connect to your gateway to load agents into the studio."
               detail={gatewayUrl || "Gateway URL is empty"}
               fillHeight

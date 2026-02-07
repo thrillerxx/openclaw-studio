@@ -53,7 +53,7 @@ describe("FleetSidebar new agent action", () => {
     );
 
     expect(screen.getByTestId("fleet-new-agent-button")).toBeInTheDocument();
-    expect(screen.getByText("New Agent")).toBeInTheDocument();
+    expect(screen.getByText("New Hacker")).toBeInTheDocument();
   });
 
   it("calls onCreateAgent when clicked", () => {

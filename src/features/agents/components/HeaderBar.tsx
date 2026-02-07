@@ -24,7 +24,7 @@ export const HeaderBar = ({
       <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
           <p className="console-title text-2xl leading-none text-foreground sm:text-3xl">
-            OpenClaw Studio
+            HackerBot OS
           </p>
         </div>
 
