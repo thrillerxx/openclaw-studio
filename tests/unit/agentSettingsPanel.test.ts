@@ -92,7 +92,7 @@ describe("AgentSettingsPanel", () => {
       })
     );
 
-    fireEvent.change(screen.getByLabelText("Agent name"), {
+    fireEvent.change(screen.getByLabelText("Hacker name"), {
       target: { value: "  Agent Two  " },
     });
     fireEvent.click(screen.getByRole("button", { name: "Update Name" }));

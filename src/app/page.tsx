@@ -574,7 +574,7 @@ const AgentStudioPage = () => {
       const resolvedAgentId = agentId.trim();
       if (!resolvedAgentId) {
         setSettingsCronJobs([]);
-        setSettingsCronError("Failed to load cron jobs: missing agent id.");
+        setSettingsCronError("Failed to load cron jobs: missing hacker id.");
         return;
       }
       setSettingsCronLoading(true);
@@ -602,7 +602,7 @@ const AgentStudioPage = () => {
       const resolvedAgentId = agentId.trim();
       if (!resolvedAgentId) {
         setSettingsHeartbeats([]);
-        setSettingsHeartbeatError("Failed to load heartbeats: missing agent id.");
+        setSettingsHeartbeatError("Failed to load heartbeats: missing hacker id.");
         return;
       }
       setSettingsHeartbeatLoading(true);
@@ -875,7 +875,7 @@ const AgentStudioPage = () => {
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load agents.";
+      const message = err instanceof Error ? err.message : "Failed to load hackers.";
       setError(message);
     } finally {
       setLoading(false);
@@ -1258,7 +1258,7 @@ const AgentStudioPage = () => {
       if (createAgentBlock) return;
       if (renameAgentBlock) return;
       if (agentId === RESERVED_MAIN_AGENT_ID) {
-        setError("The main agent cannot be deleted.");
+        setError("The main hacker cannot be deleted.");
         return;
       }
       const agent = agents.find((entry) => entry.agentId === agentId);
@@ -1323,7 +1323,7 @@ const AgentStudioPage = () => {
           },
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to delete agent.";
+        const msg = err instanceof Error ? err.message : "Failed to delete hacker.";
         setDeleteAgentBlock(null);
         setError(msg);
       }
@@ -1374,7 +1374,7 @@ const AgentStudioPage = () => {
     const remaining = Math.max(0, maxWaitMs - elapsed);
     const timeoutId = window.setTimeout(() => {
       setDeleteAgentBlock(null);
-      setError("Gateway restart timed out after deleting the agent.");
+      setError("Gateway restart timed out after deleting the hacker.");
     }, remaining);
     return () => {
       window.clearTimeout(timeoutId);
@@ -1488,7 +1488,7 @@ const AgentStudioPage = () => {
     if (deleteAgentBlock) return;
     if (renameAgentBlock) return;
     if (status !== "connected") {
-      setError("Connect to gateway before creating an agent.");
+      setError("Connect to gateway before creating a hacker.");
       return;
     }
     setCreateAgentBusy(true);
@@ -1528,7 +1528,7 @@ const AgentStudioPage = () => {
         },
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to create agent.";
+      const message = err instanceof Error ? err.message : "Failed to create hacker.";
       setCreateAgentBlock(null);
       setError(message);
     } finally {
@@ -1579,7 +1579,7 @@ const AgentStudioPage = () => {
 	          const message =
 	            err instanceof Error
 	              ? err.message
-	              : "Failed to bootstrap brain files for the new agent.";
+	              : "Failed to bootstrap brain files for the new hacker.";
 	          console.error(message, err);
 	          setError(message);
 	        }
@@ -1601,7 +1601,7 @@ const AgentStudioPage = () => {
     const remaining = Math.max(0, maxWaitMs - elapsed);
     const timeoutId = window.setTimeout(() => {
       setCreateAgentBlock(null);
-      setError("Gateway restart timed out after creating the agent.");
+      setError("Gateway restart timed out after creating the hacker.");
     }, remaining);
     return () => {
       window.clearTimeout(timeoutId);
@@ -1643,7 +1643,7 @@ const AgentStudioPage = () => {
     const remaining = Math.max(0, maxWaitMs - elapsed);
     const timeoutId = window.setTimeout(() => {
       setRenameAgentBlock(null);
-      setError("Gateway restart timed out after renaming the agent.");
+      setError("Gateway restart timed out after renaming the hacker.");
     }, remaining);
     return () => {
       window.clearTimeout(timeoutId);
@@ -1654,13 +1654,13 @@ const AgentStudioPage = () => {
     async (agentId: string) => {
       const agent = agents.find((entry) => entry.agentId === agentId);
       if (!agent) {
-        setError("Failed to start new session: agent not found.");
+        setError("Failed to start new session: hacker not found.");
         return;
       }
       try {
         const sessionKey = agent.sessionKey.trim();
         if (!sessionKey) {
-          throw new Error("Missing session key for agent.");
+          throw new Error("Missing session key for hacker.");
         }
         await client.call("sessions.reset", { key: sessionKey });
         const patch = buildNewSessionAgentPatch(agent);
@@ -1722,7 +1722,7 @@ const AgentStudioPage = () => {
         dispatch({
           type: "appendOutput",
           agentId,
-          line: "Error: Agent not found.",
+          line: "Error: Hacker not found.",
         });
         return;
       }
@@ -1753,7 +1753,7 @@ const AgentStudioPage = () => {
       });
       try {
         if (!sessionKey) {
-          throw new Error("Missing session key for agent.");
+          throw new Error("Missing session key for hacker.");
         }
         let createdSession = agent.sessionCreated;
         if (!agent.sessionSettingsSynced) {
@@ -1808,7 +1808,7 @@ const AgentStudioPage = () => {
       }
       const resolvedSessionKey = sessionKey.trim();
       if (!resolvedSessionKey) {
-        setError("Missing session key for agent.");
+        setError("Missing session key for hacker.");
         return;
       }
       if (stopBusyAgentId === agentId) {
@@ -2304,7 +2304,7 @@ const AgentStudioPage = () => {
         });
         return true;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to rename agent.";
+        const message = err instanceof Error ? err.message : "Failed to rename hacker.";
         setRenameAgentBlock(null);
         setError(message);
         return false;
@@ -2376,7 +2376,7 @@ const AgentStudioPage = () => {
     ? `Applying config change: ${activeConfigMutation.label}`
     : queuedConfigMutationCount > 0
       ? hasRunningAgents
-        ? `Queued ${queuedConfigMutationCount} config change${queuedConfigMutationCount === 1 ? "" : "s"}; waiting for ${runningAgentCount} running agent${runningAgentCount === 1 ? "" : "s"} to finish`
+        ? `Queued ${queuedConfigMutationCount} config change${queuedConfigMutationCount === 1 ? "" : "s"}; waiting for ${runningAgentCount} running hacker${runningAgentCount === 1 ? "" : "s"} to finish`
         : status !== "connected"
           ? `Queued ${queuedConfigMutationCount} config change${queuedConfigMutationCount === 1 ? "" : "s"}; waiting for gateway connection`
           : `Queued ${queuedConfigMutationCount} config change${queuedConfigMutationCount === 1 ? "" : "s"}`
@@ -2391,7 +2391,7 @@ const AgentStudioPage = () => {
       : !createAgentBlock.sawDisconnect
         ? "Waiting for gateway to restart"
         : status === "connected"
-          ? "Gateway is back online, syncing agents"
+          ? "Gateway is back online, syncing hackers"
           : "Gateway restart in progress"
     : null;
   const renameBlockStatusLine = renameAgentBlock
@@ -2402,7 +2402,7 @@ const AgentStudioPage = () => {
       : !renameAgentBlock.sawDisconnect
         ? "Waiting for gateway to restart"
         : status === "connected"
-          ? "Gateway is back online, syncing agents"
+          ? "Gateway is back online, syncing hackers"
           : "Gateway restart in progress"
     : null;
   const deleteBlockStatusLine = deleteAgentBlock
@@ -2413,7 +2413,7 @@ const AgentStudioPage = () => {
       : !deleteAgentBlock.sawDisconnect
         ? "Waiting for gateway to restart"
         : status === "connected"
-          ? "Gateway is back online, syncing agents"
+          ? "Gateway is back online, syncing hackers"
           : "Gateway restart in progress"
       : null;
 
@@ -2470,7 +2470,7 @@ const AgentStudioPage = () => {
               OpenClaw Studio
             </div>
             <div className="mt-3 text-sm text-muted-foreground">
-              {status === "connecting" ? "Connecting to gateway…" : "Loading agents…"}
+              {status === "connecting" ? "Connecting to gateway…" : "Loading hackers…"}
             </div>
           </div>
         </div>
@@ -2483,7 +2483,7 @@ const AgentStudioPage = () => {
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
           <div className="glass-panel px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            Loading agents…
+            Loading hackers…
           </div>
         </div>
       ) : null}
@@ -2743,7 +2743,7 @@ const AgentStudioPage = () => {
             <EmptyStatePanel
               label="Collective"
               title="No hackers available"
-              description="Connect to your gateway to load agents into the studio."
+              description="Connect to your gateway to load hackers into the studio."
               detail={gatewayUrl || "Gateway URL is empty"}
               fillHeight
               className="items-center px-6 py-10 text-center"
@@ -2811,7 +2811,7 @@ const AgentStudioPage = () => {
           data-testid="agent-create-restart-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Creating agent and restarting gateway"
+          aria-label="Creating hacker and restarting gateway"
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -2837,7 +2837,7 @@ const AgentStudioPage = () => {
           data-testid="agent-rename-restart-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Renaming agent and restarting gateway"
+          aria-label="Renaming hacker and restarting gateway"
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -2863,7 +2863,7 @@ const AgentStudioPage = () => {
           data-testid="agent-delete-restart-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Deleting agent and restarting gateway"
+          aria-label="Deleting hacker and restarting gateway"
         >
           <div className="w-full max-w-md rounded-lg border border-border bg-card/95 p-6 shadow-2xl">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">

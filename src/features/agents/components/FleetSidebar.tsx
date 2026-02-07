@@ -89,7 +89,7 @@ export const FleetSidebar = ({
 
       <div className="min-h-0 flex-1 overflow-auto">
         {agents.length === 0 ? (
-          <EmptyStatePanel title="No agents available." compact className="p-3 text-xs" />
+          <EmptyStatePanel title="No hackers available." compact className="p-3 text-xs" />
         ) : (
           <div className="flex flex-col gap-2">
             {agents.map((agent) => {

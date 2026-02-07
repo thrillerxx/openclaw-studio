@@ -122,7 +122,7 @@ export const AgentSettingsPanel = ({
   const handleRename = async () => {
     const next = nameDraft.trim();
     if (!next) {
-      setRenameError("Agent name is required.");
+      setRenameError("Hacker name is required.");
       return;
     }
     if (next === agent.name) {
@@ -134,7 +134,7 @@ export const AgentSettingsPanel = ({
     try {
       const ok = await onRename(next);
       if (!ok) {
-        setRenameError("Failed to rename agent.");
+        setRenameError("Failed to rename hacker.");
         return;
       }
       setNameDraft(next);
@@ -159,7 +159,7 @@ export const AgentSettingsPanel = ({
       style={{ position: "relative", left: "auto", top: "auto", width: "100%", height: "100%" }}
     >
       <AgentInspectHeader
-        label="Agent settings"
+        label="Hacker settings"
         title={agent.name}
         onClose={onClose}
         closeTestId="agent-settings-close"
@@ -174,9 +174,9 @@ export const AgentSettingsPanel = ({
             Identity
           </div>
           <label className="mt-3 flex flex-col gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            <span>Agent name</span>
+            <span>Hacker name</span>
             <input
-              aria-label="Agent name"
+              aria-label="Hacker name"
               className="h-10 rounded-md border border-border bg-card/75 px-3 text-xs font-semibold text-foreground outline-none"
               value={nameDraft}
               disabled={renameSaving}
@@ -494,7 +494,7 @@ export const AgentBrainPanel = ({
     >
       <AgentInspectHeader
         label="Brain files"
-        title={selectedAgent?.name ?? "No agent selected"}
+        title={selectedAgent?.name ?? "No hacker selected"}
         onClose={() => {
           void handleClose();
         }}

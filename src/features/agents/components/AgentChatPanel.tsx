@@ -695,8 +695,8 @@ export const AgentChatPanel = ({
             className="nodrag mt-0.5 flex h-9 w-9 items-center justify-center rounded-md border border-border/80 bg-card/60 text-muted-foreground transition hover:border-border hover:bg-muted/65"
             type="button"
             data-testid="agent-settings-toggle"
-            aria-label="Open agent settings"
-            title="Agent settings"
+            aria-label="Open hacker settings"
+            title="Hacker settings"
             onClick={onOpenSettings}
           >
             <Cog className="h-4 w-4" />

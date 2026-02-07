@@ -69,7 +69,7 @@ describe("AgentChatPanel controls", () => {
     expect(screen.getByText("Thinking")).toBeInTheDocument();
     expect(screen.queryByDisplayValue("Agent One")).not.toBeInTheDocument();
     expect(screen.getByTestId("agent-settings-toggle")).toBeInTheDocument();
-    expect(screen.getByLabelText("Open agent settings")).toBeInTheDocument();
+    expect(screen.getByLabelText("Open hacker settings")).toBeInTheDocument();
     expect(screen.queryByText("Inspect")).not.toBeInTheDocument();
   });
 
