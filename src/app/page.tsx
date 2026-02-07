@@ -2591,8 +2591,13 @@ const AgentStudioPage = () => {
                       ? "border-border bg-muted text-foreground shadow-xs"
                       : "border-border/80 bg-card/65 text-muted-foreground hover:border-border hover:bg-muted/70"
                   }`}
-                  onClick={() => setMobilePane("settings")}
-                  disabled={!settingsAgent}
+                  onClick={() => {
+                    const nextSettingsId =
+                      focusedAgent?.agentId ?? state.selectedAgentId ?? agents[0]?.agentId ?? null;
+                    setSettingsAgentId(nextSettingsId);
+                    setMobilePane("settings");
+                  }}
+                  disabled={!hasAnyAgents}
                 >
                   Settings
                 </button>
