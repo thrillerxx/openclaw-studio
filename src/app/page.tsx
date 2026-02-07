@@ -2494,8 +2494,8 @@ const AgentStudioPage = () => {
   );
   if (status === "connecting" || (status === "connected" && !agentsLoadedOnce)) {
     return (
-      <div className="relative min-h-screen w-screen overflow-hidden bg-background">
-        <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="relative min-h-[100dvh] w-screen overflow-hidden bg-background">
+        <div className="flex min-h-[100dvh] items-center justify-center px-6">
           <div className="glass-panel w-full max-w-md px-6 py-6 text-center">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               HackerBot OS
@@ -2510,7 +2510,7 @@ const AgentStudioPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen w-screen overflow-hidden bg-background">
+    <div className="relative min-h-[100dvh] w-screen overflow-hidden bg-background">
       {state.loading ? (
         <div className="pointer-events-none fixed bottom-4 left-0 right-0 z-50 flex justify-center px-3">
           <div className="glass-panel px-6 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
@@ -2518,7 +2518,7 @@ const AgentStudioPage = () => {
           </div>
         </div>
       ) : null}
-      <div className="relative z-10 flex h-screen flex-col gap-4 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6">
+      <div className="relative z-10 flex h-[100dvh] flex-col gap-4 overflow-y-auto px-3 py-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:px-4 sm:py-4 md:px-6 md:py-6">
         <div className="relative z-30 w-full">
           <HeaderBar
             status={status}
