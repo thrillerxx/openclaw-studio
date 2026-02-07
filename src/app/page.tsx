@@ -2556,11 +2556,8 @@ const AgentStudioPage = () => {
         </div>
 
       {/* HackerBot OS command bar (v1) */}
-      <div
-        className="relative z-10 w-full flex justify-center px-1 sm:px-0"
-        data-testid="hackerbot-commandbar"
-      >
-        <div className="glass-panel flex w-full max-w-3xl items-center gap-2 px-4 py-2">
+      <div className="relative z-10 w-full" data-testid="hackerbot-commandbar">
+        <div className="glass-panel flex w-full items-center gap-2 px-4 py-2">
           <div className="shrink-0 font-mono text-[15px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:text-[12px] sm:tracking-[0.16em]">
             hbos&gt;
           </div>
