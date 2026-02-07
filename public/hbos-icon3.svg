@@ -63,19 +63,17 @@
 
     <clipPath id="clip">
       <!-- Full-bleed rounded square (no outer padding) -->
-      <rect x="0" y="0" width="512" height="512" rx="110" ry="110"/>
+      <rect x="0" y="0" width="512" height="512" rx="86" ry="86"/>
     </clipPath>
   </defs>
 
   <!-- Full-bleed tile (no padding) -->
   <g>
     <!-- Tile -->
-    <rect x="0" y="0" width="512" height="512" rx="110" ry="110" fill="url(#bg)"/>
-    <!-- Inner border -->
-    <rect x="16" y="16" width="480" height="480" rx="98" ry="98" fill="none" stroke="url(#innerStroke)" stroke-width="6"/>
+    <rect x="0" y="0" width="512" height="512" rx="86" ry="86" fill="url(#bg)"/>
 
     <!-- Vignette + depth -->
-    <rect x="0" y="0" width="512" height="512" rx="110" ry="110" fill="url(#vignette)" opacity="0.95"/>
+    <rect x="0" y="0" width="512" height="512" rx="86" ry="86" fill="url(#vignette)" opacity="0.95"/>
 
     <!-- Shine sweep clipped to tile -->
     <g clip-path="url(#clip)">
