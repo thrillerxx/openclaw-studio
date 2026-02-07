@@ -368,17 +368,16 @@ const AgentChatComposer = memo(function AgentChatComposer({
   return (
     <div
       className="flex items-end gap-2"
-      onPointerDown={(event) => {
-        // Important: focus must happen *synchronously* in the user gesture.
-        // If we focus in a timeout, iOS can show a caret but refuse to open the keyboard.
-        if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
-          localRef.current?.focus();
-        }
+      onPointerDown={() => {
+        // iOS standalone can be finicky about which element receives the tap.
+        // Force-focus the textarea during the user gesture.
+        localRef.current?.focus();
       }}
-      onTouchStart={(event) => {
-        if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
-          localRef.current?.focus();
-        }
+      onTouchStart={() => {
+        localRef.current?.focus();
+      }}
+      onClick={() => {
+        localRef.current?.focus();
       }}
     >
       <textarea
@@ -390,6 +389,9 @@ const AgentChatComposer = memo(function AgentChatComposer({
         className="flex-1 min-h-10 resize-none rounded-md border border-border/80 bg-card/75 px-3 py-2 text-[16px] leading-5 text-foreground outline-none transition focus:border-ring sm:min-h-0 sm:text-[11px] sm:leading-normal"
         onTouchStart={(event) => {
           // Direct taps should always focus the input (helps iOS standalone).
+          event.currentTarget.focus();
+        }}
+        onClick={(event) => {
           event.currentTarget.focus();
         }}
         onChange={onChange}
