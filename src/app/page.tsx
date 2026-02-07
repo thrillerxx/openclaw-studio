@@ -400,18 +400,22 @@ const AgentStudioPage = () => {
   }, []);
 
   useEffect(() => {
+    const batcher = livePatchBatcherRef.current;
+    const pending = pendingLivePatchesRef.current;
+    const activityMarks = lastActivityMarkRef.current;
     return () => {
-      livePatchBatcherRef.current.cancel();
-      pendingLivePatchesRef.current.clear();
-      lastActivityMarkRef.current.clear();
+      batcher.cancel();
+      pending.clear();
+      activityMarks.clear();
     };
   }, []);
 
   const flushPendingLivePatches = useCallback(() => {
     const pending = pendingLivePatchesRef.current;
     if (pending.size === 0) return;
-    pendingLivePatchesRef.current = new Map();
-    for (const [agentId, patch] of pending) {
+    const entries = [...pending.entries()];
+    pending.clear();
+    for (const [agentId, patch] of entries) {
       dispatch({ type: "updateAgent", agentId, patch });
     }
   }, [dispatch]);
@@ -2086,6 +2090,8 @@ const AgentStudioPage = () => {
     dispatch,
     loadAgentHistory,
     loadSummarySnapshot,
+    markActivityThrottled,
+    queueLivePatch,
     refreshHeartbeatLatestUpdate,
     state.agents,
     status,

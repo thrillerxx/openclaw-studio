@@ -13,8 +13,8 @@ describe("createRafBatcher", () => {
 
   it("flushes at most once per animation frame", () => {
     const flush = vi.fn();
-    let queued: FrameRequestCallback | null = null;
-    globalThis.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+    let queued: unknown = null;
+    globalThis.requestAnimationFrame = vi.fn((cb: (time: number) => void) => {
       queued = cb;
       return 1;
     });
@@ -26,7 +26,10 @@ describe("createRafBatcher", () => {
     batcher.schedule();
 
     expect(flush).not.toHaveBeenCalled();
-    queued?.(0);
+    if (typeof queued !== "function") {
+      throw new Error("requestAnimationFrame was not scheduled.");
+    }
+    (queued as (time: number) => void)(0);
     expect(flush).toHaveBeenCalledTimes(1);
   });
 
@@ -42,4 +45,3 @@ describe("createRafBatcher", () => {
     expect(globalThis.cancelAnimationFrame).toHaveBeenCalledWith(123);
   });
 });
-

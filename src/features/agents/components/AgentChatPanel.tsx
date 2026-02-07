@@ -78,7 +78,6 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   const scrollFrameRef = useRef<number | null>(null);
   const pinnedRef = useRef(true);
   const [isPinned, setIsPinned] = useState(true);
-  const [hasUnseen, setHasUnseen] = useState(false);
 
   const scrollChatToBottom = useCallback(() => {
     if (!chatRef.current) return;
@@ -93,9 +92,6 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
     if (pinnedRef.current === nextPinned) return;
     pinnedRef.current = nextPinned;
     setIsPinned(nextPinned);
-    if (nextPinned) {
-      setHasUnseen(false);
-    }
   }, []);
 
   const updatePinnedFromScroll = useCallback(() => {
@@ -125,13 +121,13 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
     updatePinnedFromScroll();
   }, [updatePinnedFromScroll]);
 
+  const showJumpToLatest =
+    !isPinned && (outputLineCount > 0 || liveAssistantCharCount > 0 || liveThinkingCharCount > 0);
+
   useEffect(() => {
     const shouldForceScroll = scrollToBottomNextOutputRef.current;
     if (shouldForceScroll) {
       scrollToBottomNextOutputRef.current = false;
-      setHasUnseen(false);
-      pinnedRef.current = true;
-      setIsPinned(true);
       scheduleScrollToBottom();
       return;
     }
@@ -140,8 +136,6 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
       scheduleScrollToBottom();
       return;
     }
-
-    setHasUnseen(true);
   }, [
     liveAssistantCharCount,
     liveThinkingCharCount,
@@ -295,13 +289,12 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
         </div>
       </div>
 
-      {!isPinned && hasUnseen ? (
+      {showJumpToLatest ? (
         <button
           type="button"
           className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-md border border-border/80 bg-card/95 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
           onClick={() => {
             setPinned(true);
-            setHasUnseen(false);
             scrollChatToBottom();
           }}
           aria-label="Jump to latest"
