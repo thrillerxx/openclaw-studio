@@ -545,6 +545,9 @@ export const AgentChatPanel = ({
         ? "bg-destructive"
         : "bg-muted-foreground/70";
 
+  const onlineDotClassName = agent.sessionCreated ? "bg-emerald-400" : "bg-muted-foreground/35";
+  const onlineLabel = agent.sessionCreated ? "Online" : "Offline";
+
   const chatItems = useMemo(
     () =>
       buildFinalAgentChatItems({
@@ -695,6 +698,10 @@ export const AgentChatPanel = ({
                 <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${statusDotClassName}`} />
                 {statusLabel}
               </span>
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-card/65 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${onlineDotClassName}`} />
+                {onlineLabel}
+              </span>
             </div>
             <button
               className="nodrag flex h-9 w-9 items-center justify-center rounded-md border border-border/80 bg-card/60 text-muted-foreground transition hover:border-border hover:bg-muted/65"
@@ -746,6 +753,10 @@ export const AgentChatPanel = ({
                 >
                   <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${statusDotClassName}`} />
                   {statusLabel}
+                </span>
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-card/65 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${onlineDotClassName}`} />
+                  {onlineLabel}
                 </span>
               </div>
 

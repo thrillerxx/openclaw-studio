@@ -43,6 +43,11 @@ const statusDotClassName: Record<AgentState["status"], string> = {
   error: "bg-destructive",
 };
 
+const onlineDotClassName = {
+  online: "bg-emerald-400",
+  offline: "bg-muted-foreground/35",
+} as const;
+
 export const FleetSidebar = ({
   agents,
   selectedAgentId,
@@ -114,13 +119,22 @@ export const FleetSidebar = ({
                   }`}
                   onClick={() => onSelectAgent(agent.agentId)}
                 >
-                  <AgentAvatar
-                    seed={avatarSeed}
-                    name={agent.name}
-                    avatarUrl={agent.avatarUrl ?? null}
-                    size={28}
-                    isSelected={selected}
-                  />
+                  <div className="relative">
+                    <AgentAvatar
+                      seed={avatarSeed}
+                      name={agent.name}
+                      avatarUrl={agent.avatarUrl ?? null}
+                      size={28}
+                      isSelected={selected}
+                    />
+                    <span
+                      aria-hidden
+                      className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-background shadow-sm ${
+                        agent.sessionCreated ? onlineDotClassName.online : onlineDotClassName.offline
+                      }`}
+                      title={agent.sessionCreated ? "Online" : "Offline"}
+                    />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[11px] font-semibold uppercase tracking-[0.13em] text-foreground">
                       {agent.name}
@@ -134,6 +148,15 @@ export const FleetSidebar = ({
                           className={`h-1.5 w-1.5 rounded-full ${statusDotClassName[agent.status]}`}
                         />
                         {statusLabel[agent.status]}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 rounded border border-border/80 bg-card/75 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        <span
+                          aria-hidden
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            agent.sessionCreated ? onlineDotClassName.online : onlineDotClassName.offline
+                          }`}
+                        />
+                        {agent.sessionCreated ? "Online" : "Offline"}
                       </span>
                       {attention === "needs-attention" ? (
                         <span className="rounded border border-border/80 bg-card/75 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
