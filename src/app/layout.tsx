@@ -6,7 +6,11 @@ export const metadata: Metadata = {
   title: "HackerBot OS",
   description: "Focused operator studio for the OpenClaw gateway.",
   icons: {
-    icon: [{ url: "/hbos-icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/hbos-icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
 };
 
