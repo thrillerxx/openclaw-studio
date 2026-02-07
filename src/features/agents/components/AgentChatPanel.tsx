@@ -391,7 +391,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
         }}
         onChange={onChange}
         onKeyDown={onKeyDown}
-        placeholder="/kida2 … (or type a message)"
+        placeholder="Chat with hacker (type…)"
       />
       {running ? (
         <button
