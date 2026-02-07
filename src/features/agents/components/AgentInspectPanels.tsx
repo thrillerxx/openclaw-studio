@@ -606,6 +606,97 @@ export const AgentBrainPanel = ({
   selectedAgentId,
   onClose,
 }: AgentBrainPanelProps) => {
+  const [brainScope, setBrainScope] = useState<"hacker" | "collective">("hacker");
+  const COLLECTIVE_FILE_NAMES = useMemo(
+    () => ["COLLECTIVE.md", "MEMORY.md", "HACKERS.md"] as const,
+    []
+  );
+  type CollectiveFileName = (typeof COLLECTIVE_FILE_NAMES)[number];
+  const [collectiveTab, setCollectiveTab] = useState<CollectiveFileName>(
+    COLLECTIVE_FILE_NAMES[0]
+  );
+  const [collectiveLoading, setCollectiveLoading] = useState(false);
+  const [collectiveSaving, setCollectiveSaving] = useState(false);
+  const [collectiveDirty, setCollectiveDirty] = useState(false);
+  const [collectiveError, setCollectiveError] = useState<string | null>(null);
+  const [collectiveOriginal, setCollectiveOriginal] = useState("");
+  const [collectiveDraft, setCollectiveDraft] = useState("");
+  const [collectiveConfirmOpen, setCollectiveConfirmOpen] = useState(false);
+
+  const suspiciousSecrets = useMemo(() => {
+    if (!collectiveDirty) return [] as string[];
+    const hay = collectiveDraft.toLowerCase();
+    const hits: string[] = [];
+    const patterns: Array<{ key: string; match: RegExp }> = [
+      { key: "token", match: /\btoken\b/i },
+      { key: "api key", match: /api[_ -]?key/i },
+      { key: "password", match: /\bpassword\b/i },
+      { key: "secret", match: /\bsecret\b/i },
+      { key: "openclaw.json", match: /openclaw\.json/i },
+    ];
+    for (const p of patterns) {
+      if (p.match.test(hay)) hits.push(p.key);
+    }
+    return Array.from(new Set(hits));
+  }, [collectiveDirty, collectiveDraft]);
+
+  useEffect(() => {
+    if (brainScope !== "collective") return;
+    let alive = true;
+    setCollectiveLoading(true);
+    setCollectiveError(null);
+    void (async () => {
+      try {
+        const response = await fetch(`/api/collective-files?name=${encodeURIComponent(collectiveTab)}`);
+        const json = (await response.json()) as any;
+        if (!response.ok) {
+          throw new Error(json?.error ?? "Failed to load collective file.");
+        }
+        const content = String(json?.file?.content ?? "");
+        if (!alive) return;
+        setCollectiveOriginal(content);
+        setCollectiveDraft(content);
+        setCollectiveDirty(false);
+      } catch (err) {
+        if (!alive) return;
+        setCollectiveError(err instanceof Error ? err.message : "Failed to load collective file.");
+      } finally {
+        if (alive) setCollectiveLoading(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [brainScope, collectiveTab]);
+
+  const saveCollective = useCallback(async () => {
+    if (collectiveSaving) return false;
+    setCollectiveSaving(true);
+    setCollectiveError(null);
+    try {
+      const response = await fetch(`/api/collective-files?name=${encodeURIComponent(collectiveTab)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: collectiveDraft }),
+        }
+      );
+      const json = (await response.json()) as any;
+      if (!response.ok) {
+        throw new Error(json?.error ?? "Failed to save collective file.");
+      }
+      setCollectiveOriginal(collectiveDraft);
+      setCollectiveDirty(false);
+      return true;
+    } catch (err) {
+      setCollectiveError(err instanceof Error ? err.message : "Failed to save collective file.");
+      return false;
+    } finally {
+      setCollectiveSaving(false);
+    }
+  }, [collectiveDraft, collectiveSaving, collectiveTab]);
+
   const selectedAgent = useMemo(
     () =>
       selectedAgentId
@@ -635,13 +726,23 @@ export const AgentBrainPanel = ({
   );
 
   const handleClose = useCallback(async () => {
-    if (agentFilesSaving) return;
+    if (agentFilesSaving || collectiveSaving) return;
+
+    if (brainScope === "collective") {
+      if (collectiveDirty) {
+        setCollectiveConfirmOpen(true);
+        return;
+      }
+      onClose();
+      return;
+    }
+
     if (agentFilesDirty) {
       const saved = await saveAgentFiles();
       if (!saved) return;
     }
     onClose();
-  }, [agentFilesDirty, agentFilesSaving, onClose, saveAgentFiles]);
+  }, [agentFilesDirty, agentFilesSaving, brainScope, collectiveDirty, collectiveSaving, onClose, saveAgentFiles]);
 
   return (
     <div
@@ -651,48 +752,100 @@ export const AgentBrainPanel = ({
     >
       <AgentInspectHeader
         label="Brain files"
-        title={selectedAgent?.name ?? "No hacker selected"}
+        title={brainScope === "collective" ? "Collective" : (selectedAgent?.name ?? "No hacker selected")}
         onClose={() => {
           void handleClose();
         }}
         closeTestId="agent-brain-close"
-        closeDisabled={agentFilesSaving}
+        closeDisabled={agentFilesSaving || collectiveSaving}
       />
 
       <div className="flex min-h-0 flex-1 flex-col p-4">
         <section className="flex min-h-0 flex-1 flex-col" data-testid="agent-brain-files">
           <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
+                  brainScope === "hacker"
+                    ? "border-border bg-background text-foreground shadow-sm"
+                    : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
+                }`}
+                onClick={() => setBrainScope("hacker")}
+              >
+                Hacker
+              </button>
+              <button
+                type="button"
+                className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
+                  brainScope === "collective"
+                    ? "border-border bg-background text-foreground shadow-sm"
+                    : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
+                }`}
+                onClick={() => setBrainScope("collective")}
+              >
+                Collective
+              </button>
+            </div>
+
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {AGENT_FILE_META[agentFileTab].hint}
+              {brainScope === "collective"
+                ? "Shared files for the collective"
+                : AGENT_FILE_META[agentFileTab].hint}
             </div>
           </div>
-          {agentFilesError ? (
+
+          {brainScope === "collective" && collectiveError ? (
+            <div className="mt-3 rounded-md border border-destructive bg-destructive px-3 py-2 text-xs text-destructive-foreground">
+              {collectiveError}
+            </div>
+          ) : null}
+          {brainScope === "hacker" && agentFilesError ? (
             <div className="mt-3 rounded-md border border-destructive bg-destructive px-3 py-2 text-xs text-destructive-foreground">
               {agentFilesError}
             </div>
           ) : null}
 
           <div className="mt-4 flex flex-wrap items-end gap-2">
-            {AGENT_FILE_NAMES.map((name) => {
-              const active = name === agentFileTab;
-              const label = AGENT_FILE_META[name].title.replace(".md", "");
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
-                    active
-                      ? "border-border bg-background text-foreground shadow-sm"
-                      : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
-                  }`}
-                  onClick={() => {
-                    void handleTabChange(name);
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
+            {brainScope === "collective"
+              ? COLLECTIVE_FILE_NAMES.map((name) => {
+                  const active = name === collectiveTab;
+                  const label = name.replace(".md", "");
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
+                        active
+                          ? "border-border bg-background text-foreground shadow-sm"
+                          : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
+                      }`}
+                      onClick={() => setCollectiveTab(name)}
+                    >
+                      {label}
+                    </button>
+                  );
+                })
+              : AGENT_FILE_NAMES.map((name) => {
+                  const active = name === agentFileTab;
+                  const label = AGENT_FILE_META[name].title.replace(".md", "");
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      className={`rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition ${
+                        active
+                          ? "border-border bg-background text-foreground shadow-sm"
+                          : "border-transparent bg-muted/60 text-muted-foreground hover:border-border/80 hover:bg-muted"
+                      }`}
+                      onClick={() => {
+                        void handleTabChange(name);
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
           </div>
 
           <div className="mt-3 flex items-center justify-end gap-1">
@@ -723,10 +876,16 @@ export const AgentBrainPanel = ({
           <div className="mt-3 min-h-0 flex-1 rounded-md bg-muted/30 p-2">
             {previewMode ? (
               <div className="agent-markdown h-full overflow-y-auto rounded-md border border-border/80 bg-background/80 px-3 py-2 text-xs text-foreground">
-                {agentFiles[agentFileTab].content.trim().length === 0 ? (
+                {(brainScope === "collective" ? collectiveDraft : agentFiles[agentFileTab].content)
+                  .trim()
+                  .length === 0 ? (
                   <p className="text-muted-foreground">
-                    {AGENT_FILE_PLACEHOLDERS[agentFileTab]}
+                    {brainScope === "collective"
+                      ? "Shared file is empty."
+                      : AGENT_FILE_PLACEHOLDERS[agentFileTab]}
                   </p>
+                ) : brainScope === "collective" ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{collectiveDraft}</ReactMarkdown>
                 ) : (
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {agentFiles[agentFileTab].content}
@@ -736,14 +895,25 @@ export const AgentBrainPanel = ({
             ) : (
               <textarea
                 className="h-full min-h-0 w-full resize-none overflow-y-auto rounded-md border border-border/80 bg-background/80 px-3 py-2 font-mono text-xs text-foreground outline-none"
-                value={agentFiles[agentFileTab].content}
+                value={brainScope === "collective" ? collectiveDraft : agentFiles[agentFileTab].content}
                 placeholder={
-                  agentFiles[agentFileTab].content.trim().length === 0
-                    ? AGENT_FILE_PLACEHOLDERS[agentFileTab]
-                    : undefined
+                  brainScope === "collective"
+                    ? "Write shared collective notes…"
+                    : agentFiles[agentFileTab].content.trim().length === 0
+                      ? AGENT_FILE_PLACEHOLDERS[agentFileTab]
+                      : undefined
                 }
-                disabled={agentFilesLoading || agentFilesSaving}
+                disabled={
+                  brainScope === "collective"
+                    ? collectiveLoading || collectiveSaving
+                    : agentFilesLoading || agentFilesSaving
+                }
                 onChange={(event) => {
+                  if (brainScope === "collective") {
+                    setCollectiveDraft(event.target.value);
+                    setCollectiveDirty(true);
+                    return;
+                  }
                   setAgentFileContent(event.target.value);
                 }}
               />
@@ -751,8 +921,101 @@ export const AgentBrainPanel = ({
           </div>
 
           <div className="mt-3 flex items-center justify-between gap-2 pt-2">
-            <div className="text-xs text-muted-foreground">All changes saved</div>
+            <div className="text-xs text-muted-foreground">
+              {brainScope === "collective"
+                ? collectiveDirty
+                  ? "Unsaved changes"
+                  : "All changes saved"
+                : "All changes saved"}
+            </div>
+            {brainScope === "collective" ? (
+              <button
+                type="button"
+                className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+                onClick={() => setCollectiveConfirmOpen(true)}
+                disabled={!collectiveDirty || collectiveSaving}
+              >
+                {collectiveSaving ? "Saving..." : "Save"}
+              </button>
+            ) : null}
           </div>
+
+          {collectiveConfirmOpen ? (
+            <div
+              className="fixed inset-0 z-[95] flex items-center justify-center bg-background/60 px-6"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirm collective file save"
+              onClick={() => setCollectiveConfirmOpen(false)}
+            >
+              <div
+                className="glass-panel w-full max-w-xl border border-border/80 px-5 py-4"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Confirm save
+                </div>
+                <div className="mt-2 text-sm text-foreground">
+                  You’re about to write <span className="font-mono">{collectiveTab}</span> to the local
+                  collective folder.
+                </div>
+
+                {suspiciousSecrets.length > 0 ? (
+                  <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-foreground">
+                    <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-destructive">
+                      Potential secrets detected
+                    </div>
+                    <div className="mt-1 text-muted-foreground">
+                      Found: {suspiciousSecrets.join(", ")}. Make sure you’re not pasting tokens/keys.
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <div className="rounded-md border border-border/80 bg-card/60 px-3 py-2">
+                    <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Before
+                    </div>
+                    <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs text-foreground">
+{collectiveOriginal}
+                    </pre>
+                  </div>
+                  <div className="rounded-md border border-border/80 bg-card/60 px-3 py-2">
+                    <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      After
+                    </div>
+                    <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs text-foreground">
+{collectiveDraft}
+                    </pre>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    className="rounded-md border border-border/80 bg-card/75 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                    onClick={() => setCollectiveConfirmOpen(false)}
+                    disabled={collectiveSaving}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+                    onClick={() => {
+                      void (async () => {
+                        const ok = await saveCollective();
+                        if (ok) setCollectiveConfirmOpen(false);
+                      })();
+                    }}
+                    disabled={collectiveSaving}
+                  >
+                    {collectiveSaving ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </section>
       </div>
     </div>
