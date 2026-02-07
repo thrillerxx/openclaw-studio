@@ -2563,24 +2563,26 @@ const AgentStudioPage = () => {
           <div className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             hbos&gt;
           </div>
-          <input
-            value={commandDraft}
-            onChange={(event) => setCommandDraft(event.target.value)}
-            onKeyDown={handleCommandKeyDown}
-            placeholder="/kida2 …  |  /status"
-            inputMode="text"
-            enterKeyHint="go"
-            style={{ touchAction: "manipulation" }}
-            className="flex-1 min-h-10 rounded-md border border-border/80 bg-card/75 px-3 py-2 font-mono text-[16px] leading-5 text-foreground outline-none transition focus:border-ring placeholder:text-muted-foreground sm:min-h-0 sm:border-transparent sm:bg-transparent sm:px-0 sm:py-0 sm:text-[12px] sm:leading-normal"
-            aria-label="HackerBot OS command bar"
-          />
-          <button
-            type="button"
-            className="h-10 shrink-0 rounded-md border border-border/80 bg-card/70 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70"
-            onClick={handleCommandSubmit}
-          >
-            Run
-          </button>
+          <div className="relative flex-1">
+            <input
+              value={commandDraft}
+              onChange={(event) => setCommandDraft(event.target.value)}
+              onKeyDown={handleCommandKeyDown}
+              placeholder="/kida2 …  |  /status"
+              inputMode="text"
+              enterKeyHint="go"
+              style={{ touchAction: "manipulation" }}
+              className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 pr-[84px] font-mono text-[16px] leading-5 text-foreground outline-none transition focus:border-ring placeholder:text-muted-foreground sm:border-transparent sm:bg-transparent sm:pr-0 sm:text-[12px] sm:leading-normal"
+              aria-label="HackerBot OS command bar"
+            />
+            <button
+              type="button"
+              className="absolute right-1.5 top-1.5 h-7 rounded-md border border-border/80 bg-card/70 px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70 sm:static sm:ml-2 sm:h-10"
+              onClick={handleCommandSubmit}
+            >
+              Run
+            </button>
+          </div>
         </div>
       </div>
 
