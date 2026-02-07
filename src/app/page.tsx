@@ -2559,7 +2559,7 @@ const AgentStudioPage = () => {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  Install HBOS
+                  Install HackerBot OS
                 </div>
                 <div className="mt-1 text-xs text-foreground">
                   Add to Home Screen for the best iPhone experience.
