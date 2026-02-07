@@ -114,7 +114,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
         return (
           <div
             key={`chat-${agentId}-assistant-${index}`}
-            className="agent-markdown rounded-md border border-transparent px-0.5"
+            className="agent-markdown rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground"
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
           </div>
@@ -287,7 +287,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
                 </details>
               ) : null}
               {liveAssistantText ? (
-                <div className="agent-markdown rounded-md border border-transparent px-0.5 opacity-85">
+                <div className="agent-markdown rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground opacity-85">
                   {liveAssistantText}
                 </div>
               ) : null}
