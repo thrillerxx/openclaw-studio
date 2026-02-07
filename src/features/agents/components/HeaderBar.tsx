@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PaletteToggle } from "@/components/palette-toggle";
 import type { GatewayStatus } from "@/lib/gateway/GatewayClient";
 import { Brain, Ellipsis } from "lucide-react";
 
@@ -36,6 +37,7 @@ export const HeaderBar = ({
               Connecting
             </span>
           ) : null}
+          <PaletteToggle />
           <ThemeToggle />
           <button
             className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition ${
