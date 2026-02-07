@@ -355,12 +355,33 @@ const AgentChatComposer = memo(function AgentChatComposer({
   sendDisabled: boolean;
   inputRef: (el: HTMLTextAreaElement | HTMLInputElement | null) => void;
 }) {
+  const localRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleRef = useCallback(
+    (el: HTMLTextAreaElement | null) => {
+      localRef.current = el;
+      inputRef(el);
+    },
+    [inputRef]
+  );
+
   return (
-    <div className="flex items-end gap-2">
+    <div
+      className="flex items-end gap-2"
+      onPointerDown={(event) => {
+        // iOS PWA/Safari can sometimes fail to focus the textarea when tapping near its edges.
+        // Ensure the tap always targets the input.
+        if (event.target instanceof HTMLElement && event.target.tagName !== "TEXTAREA") {
+          localRef.current?.focus();
+        }
+      }}
+    >
       <textarea
-        ref={inputRef}
+        ref={handleRef}
         rows={1}
         value={value}
+        inputMode="text"
+        enterKeyHint="send"
         className="flex-1 min-h-10 resize-none rounded-md border border-border/80 bg-card/75 px-3 py-2 text-[16px] leading-5 text-foreground outline-none transition focus:border-ring sm:min-h-0 sm:text-[11px] sm:leading-normal"
         onChange={onChange}
         onKeyDown={onKeyDown}
