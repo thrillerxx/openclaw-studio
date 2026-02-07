@@ -293,7 +293,12 @@ export const AgentSettingsPanel = ({
                   type="button"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input/90 bg-background/70 text-muted-foreground transition hover:border-border hover:bg-muted/65"
                   aria-label="Hacker avatar info"
-                  title="Stored locally in studio settings"
+                  onClick={() => {
+                    // iOS/PWA: `title` tooltips don't reliably show.
+                    window.alert(
+                      "Hacker avatars are stored locally in your Studio settings (this device/browser)."
+                    );
+                  }}
                 >
                   i
                 </button>
