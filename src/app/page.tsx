@@ -278,6 +278,17 @@ const resolveNextNewAgentName = (agents: AgentState[]) => {
 
 const AgentStudioPage = () => {
   const [settingsCoordinator] = useState(() => getStudioSettingsCoordinator());
+  const [isXlLayout, setIsXlLayout] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const apply = () => setIsXlLayout(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
   const {
     client,
     status,
@@ -344,13 +355,21 @@ const AgentStudioPage = () => {
     () => getFilteredAgents(state, focusFilter),
     [focusFilter, state]
   );
+
+  // On mobile panes, the filter belongs to the Collective list, not the active chat.
+  // In xl layout (sidebar always visible), keep filter affecting the focused hacker.
+  const focusCandidates = useMemo(() => {
+    if (isXlLayout) return filteredAgents;
+    return agents;
+  }, [agents, filteredAgents, isXlLayout]);
+
   const focusedAgent = useMemo(() => {
-    if (filteredAgents.length === 0) return null;
-    const selectedInFilter = selectedAgent
-      ? filteredAgents.find((entry) => entry.agentId === selectedAgent.agentId)
+    if (focusCandidates.length === 0) return null;
+    const selectedInCandidates = selectedAgent
+      ? focusCandidates.find((entry) => entry.agentId === selectedAgent.agentId)
       : null;
-    return selectedInFilter ?? filteredAgents[0] ?? null;
-  }, [filteredAgents, selectedAgent]);
+    return selectedInCandidates ?? focusCandidates[0] ?? null;
+  }, [focusCandidates, selectedAgent]);
   const focusedAgentId = focusedAgent?.agentId ?? null;
   const settingsAgent = useMemo(() => {
     if (!settingsAgentId) return null;
@@ -2708,7 +2727,13 @@ const AgentStudioPage = () => {
                 />
               ) : (
                 <EmptyStatePanel
-                  title={hasAnyAgents ? "No hackers match this filter." : "No hackers available."}
+                  title={
+                    hasAnyAgents
+                      ? isXlLayout
+                        ? "No hackers match this filter."
+                        : "No hackers available."
+                      : "No hackers available."
+                  }
                   description={
                     hasAnyAgents
                       ? undefined
