@@ -63,9 +63,25 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
   autoExpandThinking: boolean;
   lastThinkingItemIndex: number;
 }) {
+  const timeByKeyRef = useRef<Record<string, number>>({});
+
+  const formatTime = useCallback((ms: number) => {
+    try {
+      return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
+    }
+  }, []);
+
   return (
     <>
       {chatItems.map((item, index) => {
+        const key = `chat-${agentId}-${item.kind}-${index}`;
+        if (timeByKeyRef.current[key] === undefined) {
+          timeByKeyRef.current[key] = Date.now();
+        }
+        const timestamp = timeByKeyRef.current[key];
+
         if (item.kind === "thinking") {
           return (
             <details
@@ -87,9 +103,12 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
           return (
             <div
               key={`chat-${agentId}-user-${index}`}
-              className="rounded-md border border-border/70 bg-muted/70 px-3 py-2 text-foreground"
+              className="flex flex-col items-end gap-1"
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
+              <div className="max-w-[88%] rounded-md border border-border/70 bg-muted/70 px-3 py-2 text-foreground">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
+              </div>
+              <div className="pr-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
             </div>
           );
         }
@@ -112,11 +131,11 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
           );
         }
         return (
-          <div
-            key={`chat-${agentId}-assistant-${index}`}
-            className="agent-markdown rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground"
-          >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+          <div key={`chat-${agentId}-assistant-${index}`} className="flex flex-col items-start gap-1">
+            <div className="agent-markdown max-w-[92%] rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+            </div>
+            <div className="pl-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
           </div>
         );
       })}
@@ -287,7 +306,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
                 </details>
               ) : null}
               {liveAssistantText ? (
-                <div className="agent-markdown rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground opacity-85">
+                <div className="agent-markdown max-w-[92%] rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground opacity-85">
                   {liveAssistantText}
                 </div>
               ) : null}
@@ -557,6 +576,14 @@ export const AgentChatPanel = ({
       }),
     [agent.outputLines, agent.showThinkingTraces, agent.toolCallingEnabled]
   );
+
+  const lastUserMessage = useMemo(() => {
+    for (let i = chatItems.length - 1; i >= 0; i -= 1) {
+      const item = chatItems[i];
+      if (item.kind === "user") return item.text;
+    }
+    return null;
+  }, [chatItems]);
   const liveAssistantText = agent.streamText ? normalizeAssistantDisplayText(agent.streamText) : "";
   const liveThinkingText =
     agent.showThinkingTraces && agent.thinkingTrace ? agent.thinkingTrace.trim() : "";
@@ -844,6 +871,34 @@ export const AgentChatPanel = ({
         />
 
         <div ref={composerWrapRef}>
+          {!running ? (
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => {
+                  if (!lastUserMessage) return;
+                  handleSend(lastUserMessage);
+                }}
+                disabled={!canSend || !lastUserMessage}
+                title="Re-run your last message"
+              >
+                Rerun
+              </button>
+              <button
+                type="button"
+                className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => {
+                  handleSend("Continue.");
+                }}
+                disabled={!canSend}
+                title="Nudge the hacker"
+              >
+                Nudge
+              </button>
+            </div>
+          ) : null}
+
           <AgentChatComposer
             value={draftValue}
             inputRef={handleDraftRef}
