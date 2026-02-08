@@ -503,6 +503,11 @@ const AgentChatComposer = memo(function AgentChatComposer({
   inputRef,
   onAttach,
   attaching,
+  mobile,
+  onRerun,
+  onNudge,
+  onSummarize,
+  rerunDisabled,
 }: {
   value: string;
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
@@ -516,6 +521,11 @@ const AgentChatComposer = memo(function AgentChatComposer({
   inputRef: (el: HTMLTextAreaElement | HTMLInputElement | null) => void;
   onAttach: (file: File) => void;
   attaching: boolean;
+  mobile: boolean;
+  onRerun: () => void;
+  onNudge: () => void;
+  onSummarize: () => void;
+  rerunDisabled: boolean;
 }) {
   const localRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -554,6 +564,42 @@ const AgentChatComposer = memo(function AgentChatComposer({
         >
           <Paperclip className="h-4 w-4" />
         </button>
+
+        {mobile ? (
+          <>
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={onRerun}
+              disabled={rerunDisabled}
+              aria-label="Rerun"
+              title="Rerun"
+            >
+              R
+            </button>
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={onNudge}
+              disabled={!canSend || running}
+              aria-label="Nudge"
+              title="Nudge"
+            >
+              N
+            </button>
+            <button
+              type="button"
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={onSummarize}
+              disabled={!canSend || stopBusy}
+              aria-label="Summarize"
+              title="Summarize"
+            >
+              S
+            </button>
+          </>
+        ) : null}
+
         <textarea
         ref={handleRef}
         rows={1}
@@ -590,9 +636,11 @@ const AgentChatComposer = memo(function AgentChatComposer({
           Send
         </button>
       </div>
-      <div className="px-1 text-[10px] text-muted-foreground/80">
-        {attaching ? "Uploading image…" : "Enter to send • Shift+Enter for newline"}
-      </div>
+      {!mobile ? (
+        <div className="px-1 text-[10px] text-muted-foreground/80">
+          {attaching ? "Uploading image…" : "Enter to send • Shift+Enter for newline"}
+        </div>
+      ) : null}
     </div>
   );
 });
@@ -1220,7 +1268,8 @@ export const AgentChatPanel = ({
             </div>
           ) : null}
 
-          <div className="mb-2 flex flex-wrap items-center gap-2">
+          {resolvedVariant !== "mobile" ? (
+            <div className="mb-2 flex flex-wrap items-center gap-2">
             <button
               type="button"
               className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
@@ -1279,6 +1328,7 @@ export const AgentChatPanel = ({
               {running ? (stopBusy ? "Stopping" : "Stop+Sum") : "Summarize"}
             </button>
           </div>
+          ) : null}
 
           <AgentChatComposer
             value={draftValue}
@@ -1293,6 +1343,22 @@ export const AgentChatPanel = ({
             sendDisabled={sendDisabled}
             onAttach={(file) => void handleAttach(file)}
             attaching={attaching}
+            mobile={resolvedVariant === "mobile"}
+            rerunDisabled={!canSend || running || !lastUserMessage}
+            onRerun={() => {
+              if (!lastUserMessage) return;
+              hapticTap("action");
+              handleSend(lastUserMessage);
+            }}
+            onNudge={() => {
+              hapticTap("action");
+              handleSend("Continue.");
+            }}
+            onSummarize={() => {
+              hapticTap("action");
+              if (running) onStopRun();
+              handleSend("Give a 5-bullet summary + next steps.");
+            }}
           />
         </div>
       </div>
