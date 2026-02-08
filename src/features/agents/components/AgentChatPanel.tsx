@@ -560,9 +560,17 @@ export const AgentChatPanel = ({
 
       if (!normalized.trim()) return;
       scrollToBottomNextOutputRef.current = true;
+
+      // Clear draft immediately (and shrink textarea) for a snappy messenger feel.
+      plainDraftRef.current = "";
+      // eslint-disable-next-line react-hooks/set-state-in-callback
+      setDraftValue("");
+      onDraftChange("");
+      requestAnimationFrame(() => resizeDraft());
+
       onSend(normalized.trim());
     },
-    [agent.status, canSend, onSend]
+    [agent.status, canSend, onSend, onDraftChange, resizeDraft]
   );
 
   const statusColor =
