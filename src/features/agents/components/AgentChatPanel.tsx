@@ -253,6 +253,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   scrollToBottomNextOutputRef,
   flash,
   onCopy,
+  fullBleed,
 }: {
   agentId: string;
   name: string;
@@ -271,6 +272,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   scrollToBottomNextOutputRef: MutableRefObject<boolean>;
   flash: boolean;
   onCopy: (text: string) => void;
+  fullBleed: boolean;
 }) {
   const chatRef = useRef<HTMLDivElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -382,14 +384,20 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
 
   return (
     <div
-      className={`relative flex-1 overflow-hidden rounded-md border border-border/80 bg-card/75 transition ${
-        flash ? "ring-1 ring-primary/25" : ""
-      }`}
+      className={`relative flex-1 overflow-hidden transition ${
+        fullBleed
+          ? "rounded-none border-0 bg-transparent"
+          : "rounded-md border border-border/80 bg-card/75"
+      } ${flash ? "ring-1 ring-primary/25" : ""}`}
     >
       <div
         ref={chatRef}
         data-testid="agent-chat-scroll"
-        className="h-full overflow-auto p-3 sm:p-4"
+        className={
+          fullBleed
+            ? "h-full overflow-auto px-3 pb-6 pt-3 sm:px-4"
+            : "h-full overflow-auto p-3 sm:p-4"
+        }
         onScroll={() => updatePinnedFromScroll()}
         onWheel={(event) => {
           event.stopPropagation();
@@ -1189,13 +1197,21 @@ export const AgentChatPanel = ({
           liveThinkingCharCount={agent.thinkingTrace?.length ?? 0}
           scrollToBottomNextOutputRef={scrollToBottomNextOutputRef}
           flash={chatFlash}
+          fullBleed={resolvedVariant === "mobile"}
           onCopy={(text) => {
             hapticTap("action");
             void copyToClipboard(text);
           }}
         />
 
-        <div ref={composerWrapRef}>
+        <div
+          ref={composerWrapRef}
+          className={
+            resolvedVariant === "mobile"
+              ? "sticky bottom-0 z-20 -mx-3 border-t border-border/60 bg-card/70 px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-2 sm:-mx-4 sm:px-4"
+              : ""
+          }
+        >
           {toast ? (
             <div className="pointer-events-none mb-2 flex justify-center">
               <div className="rounded-md border border-border/70 bg-card/90 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm">
