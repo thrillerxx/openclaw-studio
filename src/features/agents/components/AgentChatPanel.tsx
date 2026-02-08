@@ -537,7 +537,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
         }}
         onChange={onChange}
         onKeyDown={onKeyDown}
-        placeholder="Chat with hacker (type…)"
+        placeholder="Chat (type…)"
       />
         {/* Stop lives in the quick-actions row now (avoid duplicate Stop buttons). */}
         <button
