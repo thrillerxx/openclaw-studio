@@ -540,6 +540,38 @@ const AgentChatComposer = memo(function AgentChatComposer({
 
   return (
     <div className="flex flex-col gap-1">
+      {mobile ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="h-8 rounded-md border border-border/80 bg-card/60 px-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={onRerun}
+            disabled={rerunDisabled}
+            title="Rerun"
+          >
+            Rerun
+          </button>
+          <button
+            type="button"
+            className="h-8 rounded-md border border-border/80 bg-card/60 px-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={onNudge}
+            disabled={!canSend || running}
+            title="Nudge"
+          >
+            Nudge
+          </button>
+          <button
+            type="button"
+            className="h-8 rounded-md border border-border/80 bg-card/60 px-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={onSummarize}
+            disabled={!canSend || stopBusy}
+            title="Summarize"
+          >
+            Summarize
+          </button>
+        </div>
+      ) : null}
+
       <div className="flex items-end gap-2">
         <input
           ref={fileInputRef}
@@ -564,41 +596,6 @@ const AgentChatComposer = memo(function AgentChatComposer({
         >
           <Paperclip className="h-4 w-4" />
         </button>
-
-        {mobile ? (
-          <>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={onRerun}
-              disabled={rerunDisabled}
-              aria-label="Rerun"
-              title="Rerun"
-            >
-              R
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={onNudge}
-              disabled={!canSend || running}
-              aria-label="Nudge"
-              title="Nudge"
-            >
-              N
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={onSummarize}
-              disabled={!canSend || stopBusy}
-              aria-label="Summarize"
-              title="Summarize"
-            >
-              S
-            </button>
-          </>
-        ) : null}
 
         <textarea
         ref={handleRef}
