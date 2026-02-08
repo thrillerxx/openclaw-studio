@@ -192,7 +192,40 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
               >
                 Copy
               </button>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code: ({ children, className, ...props }) => {
+                    const text = String(children ?? "");
+                    const isBlock = Boolean(className) || text.includes("\n");
+                    if (!isBlock) {
+                      return (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    }
+                    return (
+                      <span className="relative block">
+                        <button
+                          type="button"
+                          className="absolute right-2 top-2 rounded-md border border-border/40 bg-card/70 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground opacity-0 transition hover:bg-muted/70 group-hover:opacity-100"
+                          onClick={() => onCopy(text)}
+                          aria-label="Copy code"
+                          title="Copy code"
+                        >
+                          Copy
+                        </button>
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      </span>
+                    );
+                  },
+                }}
+              >
+                {item.text}
+              </ReactMarkdown>
             </div>
             {!grouped ? renderTimestamp(timestamp, "left") : null}
           </div>
