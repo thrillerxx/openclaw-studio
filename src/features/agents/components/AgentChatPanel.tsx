@@ -1253,7 +1253,7 @@ export const AgentChatPanel = ({
           ref={composerWrapRef}
           className={
             resolvedVariant === "mobile"
-              ? "sticky bottom-0 z-20 -mx-3 border-t border-border/60 bg-card/70 px-3 pb-[calc(12px+env(safe-area-inset-bottom))] pt-2 sm:-mx-4 sm:px-4"
+              ? "sticky bottom-0 z-20 -mx-3 border-t border-border/60 bg-card/70 px-3 pb-[calc(6px+env(safe-area-inset-bottom))] pt-1 sm:-mx-4 sm:px-4"
               : ""
           }
         >
