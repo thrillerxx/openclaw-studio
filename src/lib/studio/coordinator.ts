@@ -58,6 +58,7 @@ const mergeStudioPatch = (
       ...(next.focused ? { focused: { ...next.focused } } : {}),
       ...(next.avatars ? { avatars: { ...next.avatars } } : {}),
       ...(next.avatarUrls ? { avatarUrls: { ...next.avatarUrls } } : {}),
+      ...(next.haptics !== undefined ? { haptics: next.haptics } : {}),
     };
   }
   const focused = mergeFocusedPatch(current.focused, next.focused);
@@ -75,6 +76,11 @@ const mergeStudioPatch = (
     ...(focused ? { focused } : {}),
     ...(avatars ? { avatars } : {}),
     ...(avatarUrls ? { avatarUrls } : {}),
+    ...(next.haptics !== undefined
+      ? { haptics: next.haptics }
+      : current.haptics !== undefined
+        ? { haptics: current.haptics }
+        : {}),
   };
 };
 

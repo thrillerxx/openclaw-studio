@@ -12,6 +12,8 @@ export type StudioFocusedPreference = {
   filter: FocusFilter;
 };
 
+export type HapticsLevel = "off" | "subtle" | "strong";
+
 export type StudioSettings = {
   version: 1;
   gateway: StudioGatewaySettings | null;
@@ -20,6 +22,8 @@ export type StudioSettings = {
   avatars: Record<string, Record<string, string>>;
   /** avatar URL overrides (http(s):// or data:image/*) */
   avatarUrls: Record<string, Record<string, string>>;
+  /** Haptics feedback level (best-effort; iOS may fall back to visual only). */
+  haptics: HapticsLevel;
 };
 
 export type StudioSettingsPatch = {
@@ -27,6 +31,7 @@ export type StudioSettingsPatch = {
   focused?: Record<string, Partial<StudioFocusedPreference> | null>;
   avatars?: Record<string, Record<string, string | null> | null>;
   avatarUrls?: Record<string, Record<string, string | null> | null>;
+  haptics?: HapticsLevel;
 };
 
 const SETTINGS_VERSION = 1 as const;
@@ -168,7 +173,17 @@ export const defaultStudioSettings = (): StudioSettings => ({
   focused: {},
   avatars: {},
   avatarUrls: {},
+  haptics: "subtle",
 });
+
+const normalizeHapticsLevel = (
+  value: unknown,
+  fallback: HapticsLevel = "subtle"
+): HapticsLevel => {
+  const v = coerceString(value);
+  if (v === "off" || v === "subtle" || v === "strong") return v;
+  return fallback;
+};
 
 export const normalizeStudioSettings = (raw: unknown): StudioSettings => {
   if (!isRecord(raw)) return defaultStudioSettings();
@@ -176,12 +191,14 @@ export const normalizeStudioSettings = (raw: unknown): StudioSettings => {
   const focused = normalizeFocused(raw.focused);
   const avatars = normalizeAvatars(raw.avatars);
   const avatarUrls = normalizeAvatarUrls(raw.avatarUrls);
+  const haptics = normalizeHapticsLevel(raw.haptics);
   return {
     version: SETTINGS_VERSION,
     gateway,
     focused,
     avatars,
     avatarUrls,
+    haptics,
   };
 };
 
@@ -194,6 +211,10 @@ export const mergeStudioSettings = (
   const nextFocused = { ...current.focused };
   const nextAvatars = { ...current.avatars };
   const nextAvatarUrls = { ...current.avatarUrls };
+  const nextHaptics =
+    patch.haptics === undefined
+      ? current.haptics
+      : normalizeHapticsLevel(patch.haptics, current.haptics);
   if (patch.focused) {
     for (const [keyRaw, value] of Object.entries(patch.focused)) {
       const key = normalizeGatewayKey(keyRaw);
@@ -278,6 +299,7 @@ export const mergeStudioSettings = (
     focused: nextFocused,
     avatars: nextAvatars,
     avatarUrls: nextAvatarUrls,
+    haptics: nextHaptics,
   };
 };
 

@@ -5,6 +5,8 @@ type ConnectionPanelProps = {
   token: string;
   status: GatewayStatus;
   error: string | null;
+  hapticsLevel?: "off" | "subtle" | "strong";
+  onHapticsLevelChange?: (value: "off" | "subtle" | "strong") => void;
   onGatewayUrlChange: (value: string) => void;
   onTokenChange: (value: string) => void;
   onConnect: () => void;
@@ -32,6 +34,8 @@ export const ConnectionPanel = ({
   token,
   status,
   error,
+  hapticsLevel = "subtle",
+  onHapticsLevelChange,
   onGatewayUrlChange,
   onTokenChange,
   onConnect,
@@ -85,6 +89,25 @@ export const ConnectionPanel = ({
       <div className="rounded-md border border-border/70 bg-card/60 px-4 py-3">
         <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
           App
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Haptics
+            <select
+              className="h-8 rounded-md border border-border bg-card/75 px-2 text-[11px] font-semibold text-foreground"
+              value={hapticsLevel}
+              onChange={(event) =>
+                onHapticsLevelChange?.(event.target.value as "off" | "subtle" | "strong")
+              }
+              disabled={!onHapticsLevelChange}
+              aria-label="Haptics"
+            >
+              <option value="off">Off</option>
+              <option value="subtle">Subtle</option>
+              <option value="strong">Strong</option>
+            </select>
+          </label>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-md border border-border/70 bg-muted px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">

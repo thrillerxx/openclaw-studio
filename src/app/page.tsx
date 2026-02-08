@@ -367,6 +367,9 @@ const AgentStudioPage = () => {
   const [stopBusyAgentId, setStopBusyAgentId] = useState<string | null>(null);
   const [mobilePane, setMobilePane] = useState<MobilePane>("chat");
   const [settingsAgentId, setSettingsAgentId] = useState<string | null>(null);
+  const [studioHapticsLevel, setStudioHapticsLevel] = useState<"off" | "subtle" | "strong">(
+    "subtle"
+  );
   const [settingsCronJobs, setSettingsCronJobs] = useState<CronJobSummary[]>([]);
   const [settingsCronLoading, setSettingsCronLoading] = useState(false);
   const [settingsCronError, setSettingsCronError] = useState<string | null>(null);
@@ -826,6 +829,14 @@ const AgentStudioPage = () => {
       if (gatewayKey) {
         try {
           settings = await settingsCoordinator.loadSettings();
+          if (settings?.haptics) {
+            setStudioHapticsLevel(settings.haptics);
+            try {
+              localStorage.setItem("hbos.haptics", settings.haptics);
+            } catch {
+              // ignore
+            }
+          }
         } catch (err) {
           console.error("Failed to load studio settings while loading agents.", err);
         }
@@ -2828,6 +2839,17 @@ const AgentStudioPage = () => {
                 token={token}
                 status={status}
                 error={gatewayError}
+                hapticsLevel={studioHapticsLevel}
+                onHapticsLevelChange={(value) => {
+                  setStudioHapticsLevel(value);
+                  try {
+                    localStorage.setItem("hbos.haptics", value);
+                    window.dispatchEvent(new Event("hbos-haptics-change"));
+                  } catch {
+                    // ignore
+                  }
+                  settingsCoordinator.schedulePatch({ haptics: value }, 0);
+                }}
                 onGatewayUrlChange={setGatewayUrl}
                 onTokenChange={setToken}
                 onConnect={() => void connect()}

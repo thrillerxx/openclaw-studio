@@ -207,6 +207,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   liveAssistantCharCount,
   liveThinkingCharCount,
   scrollToBottomNextOutputRef,
+  flash,
 }: {
   agentId: string;
   name: string;
@@ -223,6 +224,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   liveAssistantCharCount: number;
   liveThinkingCharCount: number;
   scrollToBottomNextOutputRef: MutableRefObject<boolean>;
+  flash: boolean;
 }) {
   const chatRef = useRef<HTMLDivElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -333,7 +335,11 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   }, []);
 
   return (
-    <div className="relative flex-1 overflow-hidden rounded-md border border-border/80 bg-card/75">
+    <div
+      className={`relative flex-1 overflow-hidden rounded-md border border-border/80 bg-card/75 transition ${
+        flash ? "ring-1 ring-primary/25" : ""
+      }`}
+    >
       <div
         ref={chatRef}
         data-testid="agent-chat-scroll"
@@ -540,6 +546,62 @@ export const AgentChatPanel = ({
   const resolvedVariant = effectiveVariant ?? autoVariant;
 
   const scrollToBottomNextOutputRef = useRef(false);
+
+  const [chatFlash, setChatFlash] = useState(false);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = null;
+    };
+  }, []);
+
+  const resolveHapticsLevel = useCallback((): "off" | "subtle" | "strong" => {
+    try {
+      const v = localStorage.getItem("hbos.haptics")?.trim();
+      if (v === "off" || v === "subtle" || v === "strong") return v;
+    } catch {
+      // ignore
+    }
+    return "subtle";
+  }, []);
+
+  const hapticTap = useCallback(
+    (kind: "send" | "received" | "action") => {
+      const level = resolveHapticsLevel();
+      if (level === "off") return;
+
+      // Visual fallback (always): brief ring flash.
+      setChatFlash(true);
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = setTimeout(() => setChatFlash(false), 220);
+
+      // Best-effort vibration (iOS often blocks this; Android usually works).
+      try {
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+          const base = level === "strong" ? 18 : 8;
+          const pattern = kind === "received" ? [base] : [base, 8, base];
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (navigator as any).vibrate?.(pattern);
+        }
+      } catch {
+        // ignore
+      }
+    },
+    [resolveHapticsLevel]
+  );
+
+  useEffect(() => {
+    const onChange = () => {
+      // no-op; reading localStorage on tap is enough.
+    };
+    window.addEventListener("storage", onChange);
+    window.addEventListener("hbos-haptics-change", onChange);
+    return () => {
+      window.removeEventListener("storage", onChange);
+      window.removeEventListener("hbos-haptics-change", onChange);
+    };
+  }, []);
   const composerWrapRef = useRef<HTMLDivElement | null>(null);
   const lastOutputLineCountRef = useRef<number>(agent.outputLines.length);
 
@@ -621,9 +683,10 @@ export const AgentChatPanel = ({
       onDraftChange("");
       requestAnimationFrame(() => resizeDraft());
 
+      hapticTap("send");
       onSend(normalized.trim());
     },
-    [agent.status, canSend, onSend, onDraftChange, resizeDraft]
+    [agent.status, canSend, onSend, onDraftChange, resizeDraft, hapticTap]
   );
 
   const statusColor =
@@ -793,7 +856,7 @@ export const AgentChatPanel = ({
         return;
       }
     },
-    [draftValue, handleSend, lastUserMessage]
+    [draftValue, handleSend, lastUserMessage, hapticTap]
   );
 
   const handleComposerSend = useCallback(() => {
@@ -965,6 +1028,7 @@ export const AgentChatPanel = ({
           liveAssistantCharCount={agent.streamText?.length ?? 0}
           liveThinkingCharCount={agent.thinkingTrace?.length ?? 0}
           scrollToBottomNextOutputRef={scrollToBottomNextOutputRef}
+          flash={chatFlash}
         />
 
         <div ref={composerWrapRef}>
@@ -974,6 +1038,7 @@ export const AgentChatPanel = ({
               className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={() => {
                 if (!lastUserMessage) return;
+                hapticTap("action");
                 handleSend(lastUserMessage);
               }}
               disabled={!canSend || running || !lastUserMessage}
@@ -986,6 +1051,7 @@ export const AgentChatPanel = ({
               type="button"
               className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={() => {
+                hapticTap("action");
                 handleSend("Continue.");
               }}
               disabled={!canSend || running}
@@ -998,6 +1064,7 @@ export const AgentChatPanel = ({
               type="button"
               className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={() => {
+                hapticTap("action");
                 // Cancel the current run (if any), then request a tight summary.
                 if (running) onStopRun();
                 handleSend("Give a 5-bullet summary + next steps.");
