@@ -12,7 +12,7 @@ import {
 import type { AgentState as AgentRecord } from "@/features/agents/state/store";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Cog, Shuffle } from "lucide-react";
+import { Cog, Shuffle, Paperclip } from "lucide-react";
 import type { GatewayModelChoice } from "@/lib/gateway/models";
 import { isToolMarkdown, isTraceMarkdown } from "@/lib/text/message-extract";
 import { isNearBottom } from "@/lib/dom/scroll";
@@ -460,6 +460,8 @@ const AgentChatComposer = memo(function AgentChatComposer({
   running,
   sendDisabled,
   inputRef,
+  onAttach,
+  attaching,
 }: {
   value: string;
   onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
@@ -471,8 +473,11 @@ const AgentChatComposer = memo(function AgentChatComposer({
   running: boolean;
   sendDisabled: boolean;
   inputRef: (el: HTMLTextAreaElement | HTMLInputElement | null) => void;
+  onAttach: (file: File) => void;
+  attaching: boolean;
 }) {
   const localRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleRef = useCallback(
     (el: HTMLTextAreaElement | null) => {
@@ -485,6 +490,29 @@ const AgentChatComposer = memo(function AgentChatComposer({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-end gap-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            onAttach(file);
+            // allow selecting the same file again
+            event.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          className="flex h-10 w-10 items-center justify-center rounded-md border border-border/80 bg-card/60 text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label="Attach image"
+          title={attaching ? "Uploading…" : "Attach image"}
+          disabled={attaching}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Paperclip className="h-4 w-4" />
+        </button>
         <textarea
         ref={handleRef}
         rows={1}
@@ -522,7 +550,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
         </button>
       </div>
       <div className="px-1 text-[10px] text-muted-foreground/80">
-        Enter to send • Shift+Enter for newline
+        {attaching ? "Uploading image…" : "Enter to send • Shift+Enter for newline"}
       </div>
     </div>
   );
@@ -871,7 +899,8 @@ export const AgentChatPanel = ({
 
   const avatarSeed = agent.avatarSeed ?? agent.agentId;
   const running = agent.status === "running";
-  const sendDisabled = !canSend || running || !draftValue.trim();
+  const [attaching, setAttaching] = useState(false);
+  const sendDisabled = !canSend || running || attaching || !draftValue.trim();
 
   const handleComposerChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -918,6 +947,48 @@ export const AgentChatPanel = ({
   const handleComposerSend = useCallback(() => {
     handleSend(draftValue);
   }, [draftValue, handleSend]);
+
+  const handleAttach = useCallback(
+    async (file: File) => {
+      if (!canSend) return;
+      if (attaching) return;
+      setAttaching(true);
+      try {
+        const form = new FormData();
+        form.append("file", file);
+        const res = await fetch("/api/uploads", { method: "POST", body: form });
+        const json = (await res.json()) as { url?: string; error?: string };
+        if (!res.ok || !json.url) {
+          throw new Error(json.error || "Upload failed");
+        }
+        const absoluteUrl = (() => {
+          try {
+            return new URL(json.url, window.location.origin).toString();
+          } catch {
+            return json.url;
+          }
+        })();
+
+        const insertion = `\n\n![screenshot](${absoluteUrl})\n`;
+        setDraftValue((v) => {
+          const next = `${v}${insertion}`;
+          plainDraftRef.current = next;
+          onDraftChange(next);
+          return next;
+        });
+        requestAnimationFrame(() => resizeDraft());
+        hapticTap("action");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Upload failed";
+        setToast(message);
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setToast(null), 1400);
+      } finally {
+        setAttaching(false);
+      }
+    },
+    [attaching, canSend, hapticTap, onDraftChange, resizeDraft]
+  );
 
   return (
     <div data-agent-panel className="group fade-up relative flex h-full w-full flex-col">
@@ -1171,6 +1242,8 @@ export const AgentChatPanel = ({
             stopBusy={stopBusy}
             running={running}
             sendDisabled={sendDisabled}
+            onAttach={(file) => void handleAttach(file)}
+            attaching={attaching}
           />
         </div>
       </div>
