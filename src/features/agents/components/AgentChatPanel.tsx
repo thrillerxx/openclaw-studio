@@ -100,15 +100,22 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
           );
         }
         if (item.kind === "user") {
+          const nextKind = chatItems[index + 1]?.kind;
+          const grouped = nextKind === "user";
           return (
-            <div
-              key={`chat-${agentId}-user-${index}`}
-              className="flex flex-col items-end gap-1"
-            >
-              <div className="max-w-[88%] rounded-md border border-border/70 bg-muted/70 px-3 py-2 text-foreground">
+            <div key={`chat-${agentId}-user-${index}`} className="flex flex-col items-end gap-1">
+              <div
+                className={`max-w-[88%] border border-border/70 bg-muted/70 px-3 py-2 text-foreground ${
+                  grouped ? "rounded-md rounded-br-sm" : "rounded-md"
+                }`}
+              >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
               </div>
-              <div className="pr-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
+              {!grouped ? (
+                <div className="pr-1 text-[10px] text-muted-foreground/80">
+                  {formatTime(timestamp)}
+                </div>
+              ) : null}
             </div>
           );
         }
@@ -130,12 +137,20 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
             </details>
           );
         }
+        const nextKind = chatItems[index + 1]?.kind;
+        const grouped = nextKind === "assistant";
         return (
           <div key={`chat-${agentId}-assistant-${index}`} className="flex flex-col items-start gap-1">
-            <div className="agent-markdown max-w-[92%] rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-foreground">
+            <div
+              className={`agent-markdown max-w-[92%] border border-primary/20 bg-primary/5 px-3 py-2 text-foreground ${
+                grouped ? "rounded-md rounded-bl-sm" : "rounded-md"
+              }`}
+            >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
             </div>
-            <div className="pl-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
+            {!grouped ? (
+              <div className="pl-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
+            ) : null}
           </div>
         );
       })}
@@ -270,7 +285,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
           event.stopPropagation();
         }}
       >
-        <div className="flex flex-col gap-3 text-xs text-foreground">
+        <div className="flex flex-col gap-2 text-xs text-foreground">
           {chatItems.length === 0 ? (
             <EmptyStatePanel title="No messages yet." compact className="p-3 text-xs" />
           ) : (
@@ -319,8 +334,9 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
                 >
                   <AgentAvatar seed={avatarSeed} name={name} avatarUrl={avatarUrl} size={22} />
                   <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.11em]">
-                    Thinking
+                    {name}
                   </span>
+                  <span className="text-[10px] text-muted-foreground/80">Thinking</span>
                   <span className="typing-dots" aria-hidden="true">
                     <span />
                     <span />
@@ -412,6 +428,9 @@ const AgentChatComposer = memo(function AgentChatComposer({
         onKeyDown={onKeyDown}
         placeholder="Chat with hacker (type…)"
       />
+      <div className="mt-1 px-1 text-[10px] text-muted-foreground/80">
+        Enter to send • Shift+Enter for newline
+      </div>
       {running ? (
         <button
           className="rounded-md border border-border/80 bg-card/70 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
