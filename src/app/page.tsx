@@ -2788,6 +2788,38 @@ const AgentStudioPage = () => {
       </div>
 
 
+        {status !== "connected" ? (
+          <div className="w-full">
+            <div className="glass-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Gateway
+                </div>
+                <div className="mt-1 text-xs text-foreground">
+                  Disconnected. Chat and controls are paused.
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  className="rounded-md border border-border/80 bg-card/75 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition hover:bg-muted/70"
+                  onClick={() => setShowConnectionPanel(true)}
+                >
+                  Settings
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md border border-transparent bg-primary/90 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+                  onClick={() => void connect()}
+                  disabled={!gatewayUrl.trim()}
+                >
+                  Reconnect
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {connectionPanelVisible ? (
           <div className="w-full">
             <div className="glass-panel px-4 py-4 sm:px-6 sm:py-6">
