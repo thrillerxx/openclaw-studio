@@ -55,6 +55,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
   chatItemTimes,
   autoExpandThinking,
   lastThinkingItemIndex,
+  onCopy,
 }: {
   agentId: string;
   name: string;
@@ -64,6 +65,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
   chatItemTimes: number[];
   autoExpandThinking: boolean;
   lastThinkingItemIndex: number;
+  onCopy: (text: string) => void;
 }) {
   const formatRelative = useCallback((ms: number) => {
     const s = Math.max(0, Math.floor(ms / 1000));
@@ -177,10 +179,19 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
         return (
           <div key={`chat-${agentId}-assistant-${index}`} className="flex flex-col items-start gap-1">
             <div
-              className={`agent-markdown max-w-[92%] border border-primary/20 bg-primary/5 px-3 py-2 text-foreground ${
+              className={`agent-markdown group relative max-w-[92%] border border-primary/20 bg-primary/5 px-3 py-2 text-foreground ${
                 grouped ? "rounded-md rounded-bl-sm" : "rounded-md"
               }`}
             >
+              <button
+                type="button"
+                className="absolute right-2 top-2 rounded-md border border-border/40 bg-card/60 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground opacity-0 transition hover:bg-muted/70 group-hover:opacity-100"
+                onClick={() => onCopy(item.text)}
+                aria-label="Copy message"
+                title="Copy"
+              >
+                Copy
+              </button>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
             </div>
             {!grouped ? renderTimestamp(timestamp, "left") : null}
@@ -208,6 +219,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   liveThinkingCharCount,
   scrollToBottomNextOutputRef,
   flash,
+  onCopy,
 }: {
   agentId: string;
   name: string;
@@ -225,6 +237,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   liveThinkingCharCount: number;
   scrollToBottomNextOutputRef: MutableRefObject<boolean>;
   flash: boolean;
+  onCopy: (text: string) => void;
 }) {
   const chatRef = useRef<HTMLDivElement | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -366,6 +379,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
                 chatItemTimes={chatItemTimes}
                 autoExpandThinking={autoExpandThinking}
                 lastThinkingItemIndex={lastThinkingItemIndex}
+                onCopy={(text) => onCopy(text)}
               />
               {liveThinkingText ? (
                 <details
@@ -549,10 +563,15 @@ export const AgentChatPanel = ({
 
   const [chatFlash, setChatFlash] = useState(false);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     return () => {
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       flashTimerRef.current = null;
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
     };
   }, []);
 
@@ -565,6 +584,43 @@ export const AgentChatPanel = ({
     }
     return "subtle";
   }, []);
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 1100);
+  }, []);
+
+  const copyToClipboard = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(trimmed);
+          showToast("Copied");
+          return;
+        }
+      } catch {
+        // ignore and fall back
+      }
+      try {
+        const el = document.createElement("textarea");
+        el.value = trimmed;
+        el.setAttribute("readonly", "true");
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        showToast("Copied");
+      } catch {
+        showToast("Copy failed");
+      }
+    },
+    [showToast]
+  );
 
   const hapticTap = useCallback(
     (kind: "send" | "received" | "action") => {
@@ -1029,9 +1085,21 @@ export const AgentChatPanel = ({
           liveThinkingCharCount={agent.thinkingTrace?.length ?? 0}
           scrollToBottomNextOutputRef={scrollToBottomNextOutputRef}
           flash={chatFlash}
+          onCopy={(text) => {
+            hapticTap("action");
+            void copyToClipboard(text);
+          }}
         />
 
         <div ref={composerWrapRef}>
+          {toast ? (
+            <div className="pointer-events-none mb-2 flex justify-center">
+              <div className="rounded-md border border-border/70 bg-card/90 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm">
+                {toast}
+              </div>
+            </div>
+          ) : null}
+
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -1046,6 +1114,22 @@ export const AgentChatPanel = ({
             >
               Rerun
             </button>
+
+            {agent.status === "error" ? (
+              <button
+                type="button"
+                className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-destructive transition hover:bg-destructive/15 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => {
+                  if (!lastUserMessage) return;
+                  hapticTap("action");
+                  handleSend(lastUserMessage);
+                }}
+                disabled={!canSend || running || !lastUserMessage}
+                title="Retry last (error)"
+              >
+                Retry
+              </button>
+            ) : null}
 
             <button
               type="button"
