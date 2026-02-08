@@ -52,6 +52,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
   avatarSeed,
   avatarUrl,
   chatItems,
+  chatItemTimes,
   autoExpandThinking,
   lastThinkingItemIndex,
 }: {
@@ -60,27 +61,65 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
   avatarSeed: string;
   avatarUrl: string | null;
   chatItems: AgentChatItem[];
+  chatItemTimes: number[];
   autoExpandThinking: boolean;
   lastThinkingItemIndex: number;
 }) {
-  const timeByKeyRef = useRef<Record<string, number>>({});
+  const formatRelative = useCallback((ms: number) => {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    if (s < 5) return "now";
+    if (s < 60) return `${s}s ago`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    return `${d}d ago`;
+  }, []);
 
-  const formatTime = useCallback((ms: number) => {
+  const formatTime = useCallback((ms: number, opts?: { includeDate?: boolean }) => {
     try {
-      return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const d = new Date(ms);
+      if (opts?.includeDate) {
+        return d.toLocaleString([], {
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     } catch {
       return "";
     }
   }, []);
 
+  const renderTimestamp = useCallback(
+    (timestamp: number, align: "left" | "right") => {
+      const now = Date.now();
+      const ageMs = Math.max(0, now - timestamp);
+      const base = formatTime(timestamp, { includeDate: ageMs >= 24 * 60 * 60 * 1000 });
+      const hover = formatRelative(ageMs);
+      const full = formatTime(timestamp, { includeDate: true });
+      return (
+        <div
+          className={`group text-[10px] text-muted-foreground/80 ${
+            align === "left" ? "pl-1" : "pr-1"
+          }`}
+          title={full}
+        >
+          <span className="group-hover:hidden">{base}</span>
+          <span className="hidden group-hover:inline">{hover}</span>
+        </div>
+      );
+    },
+    [formatRelative, formatTime]
+  );
+
   return (
     <>
       {chatItems.map((item, index) => {
-        const key = `chat-${agentId}-${item.kind}-${index}`;
-        if (timeByKeyRef.current[key] === undefined) {
-          timeByKeyRef.current[key] = Date.now();
-        }
-        const timestamp = timeByKeyRef.current[key];
+        const timestamp = chatItemTimes[index] ?? Date.now();
 
         if (item.kind === "thinking") {
           return (
@@ -111,11 +150,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
               >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{`> ${item.text}`}</ReactMarkdown>
               </div>
-              {!grouped ? (
-                <div className="pr-1 text-[10px] text-muted-foreground/80">
-                  {formatTime(timestamp)}
-                </div>
-              ) : null}
+              {!grouped ? renderTimestamp(timestamp, "right") : null}
             </div>
           );
         }
@@ -148,9 +183,7 @@ const AgentChatFinalItems = memo(function AgentChatFinalItems({
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
             </div>
-            {!grouped ? (
-              <div className="pl-1 text-[10px] text-muted-foreground/80">{formatTime(timestamp)}</div>
-            ) : null}
+            {!grouped ? renderTimestamp(timestamp, "left") : null}
           </div>
         );
       })}
@@ -196,6 +229,34 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
   const scrollFrameRef = useRef<number | null>(null);
   const pinnedRef = useRef(true);
   const [isPinned, setIsPinned] = useState(true);
+
+  // Stable-ish timestamps: preserve times for the shared prefix of messages.
+  const chatItemTimesRef = useRef<number[]>([]);
+  const prevChatItemsRef = useRef<AgentChatItem[]>([]);
+  const chatItemTimes = useMemo(() => {
+    const prevItems = prevChatItemsRef.current;
+    const prevTimes = chatItemTimesRef.current;
+
+    let prefix = 0;
+    while (prefix < prevItems.length && prefix < chatItems.length) {
+      const a = prevItems[prefix];
+      const b = chatItems[prefix];
+      if (!a || !b) break;
+      if (a.kind !== b.kind) break;
+      if (a.text !== b.text) break;
+      prefix += 1;
+    }
+
+    const nextTimes: number[] = prevTimes.slice(0, prefix);
+    const now = Date.now();
+    for (let i = prefix; i < chatItems.length; i += 1) {
+      nextTimes[i] = now;
+    }
+
+    prevChatItemsRef.current = chatItems;
+    chatItemTimesRef.current = nextTimes;
+    return nextTimes;
+  }, [chatItems]);
 
   const scrollChatToBottom = useCallback(() => {
     if (!chatRef.current) return;
@@ -296,6 +357,7 @@ const AgentChatTranscript = memo(function AgentChatTranscript({
                 avatarSeed={avatarSeed}
                 avatarUrl={avatarUrl}
                 chatItems={chatItems}
+                chatItemTimes={chatItemTimes}
                 autoExpandThinking={autoExpandThinking}
                 lastThinkingItemIndex={lastThinkingItemIndex}
               />
