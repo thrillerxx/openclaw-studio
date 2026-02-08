@@ -167,7 +167,8 @@ describe("AgentChatPanel controls", () => {
       })
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Stop" }));
+    // Stop is now wired via the Stop+Sum button when running.
+    fireEvent.click(screen.getByRole("button", { name: "Stop+Sum" }));
     expect(onStopRun).toHaveBeenCalledTimes(1);
   });
 

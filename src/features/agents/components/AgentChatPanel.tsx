@@ -998,22 +998,14 @@ export const AgentChatPanel = ({
               type="button"
               className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={() => {
-                handleSend("Stop. Give a 5-bullet summary + next steps.");
+                // Cancel the current run (if any), then request a tight summary.
+                if (running) onStopRun();
+                handleSend("Give a 5-bullet summary + next steps.");
               }}
-              disabled={!canSend || running}
-              title="Stop & summarize"
+              disabled={!canSend || stopBusy}
+              title={running ? "Stop and summarize" : "Summarize"}
             >
-              Stop+Sum
-            </button>
-
-            <button
-              type="button"
-              className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={() => onStopRun()}
-              disabled={!canSend || !running || stopBusy}
-              title="Stop"
-            >
-              {stopBusy ? "Stopping" : "Stop"}
+              {running ? (stopBusy ? "Stopping" : "Stop+Sum") : "Summarize"}
             </button>
           </div>
 
