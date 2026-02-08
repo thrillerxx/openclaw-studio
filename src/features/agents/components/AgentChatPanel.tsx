@@ -498,7 +498,7 @@ const AgentChatComposer = memo(function AgentChatComposer({
             onClick={onStop}
             disabled={!canSend || stopBusy}
           >
-            {stopBusy ? "Stopping" : "Stop"}
+            {stopBusy ? "Stopping" : "Stop (hold)"}
           </button>
         ) : null}
         <button
@@ -782,12 +782,27 @@ export const AgentChatPanel = ({
 
   const handleComposerKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key !== "Enter" || event.shiftKey) return;
       if (event.defaultPrevented) return;
-      event.preventDefault();
-      handleSend(draftValue);
+
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        handleSend(draftValue);
+        return;
+      }
+
+      if ((event.key === "r" || event.key === "R") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        if (lastUserMessage) handleSend(lastUserMessage);
+        return;
+      }
+
+      if ((event.key === "n" || event.key === "N") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        handleSend("Continue.");
+        return;
+      }
     },
-    [draftValue, handleSend]
+    [draftValue, handleSend, lastUserMessage]
   );
 
   const handleComposerSend = useCallback(() => {
@@ -962,33 +977,54 @@ export const AgentChatPanel = ({
         />
 
         <div ref={composerWrapRef}>
-          {!running ? (
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={() => {
-                  if (!lastUserMessage) return;
-                  handleSend(lastUserMessage);
-                }}
-                disabled={!canSend || !lastUserMessage}
-                title="Re-run your last message"
-              >
-                Rerun
-              </button>
-              <button
-                type="button"
-                className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={() => {
-                  handleSend("Continue.");
-                }}
-                disabled={!canSend}
-                title="Nudge the hacker"
-              >
-                Nudge
-              </button>
-            </div>
-          ) : null}
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={() => {
+                if (!lastUserMessage) return;
+                handleSend(lastUserMessage);
+              }}
+              disabled={!canSend || running || !lastUserMessage}
+              title="Re-run your last message (R)"
+            >
+              Rerun
+            </button>
+
+            <button
+              type="button"
+              className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={() => {
+                handleSend("Continue.");
+              }}
+              disabled={!canSend || running}
+              title="Nudge the hacker (N)"
+            >
+              Nudge
+            </button>
+
+            <button
+              type="button"
+              className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={() => {
+                handleSend("Stop. Give a 5-bullet summary + next steps.");
+              }}
+              disabled={!canSend || running}
+              title="Stop & summarize"
+            >
+              Stop+Sum
+            </button>
+
+            <button
+              type="button"
+              className="rounded-md border border-border/70 bg-card/60 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition hover:bg-muted/70 disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={() => onStopRun()}
+              disabled={!canSend || !running || stopBusy}
+              title="Stop"
+            >
+              {stopBusy ? "Stopping" : "Stop"}
+            </button>
+          </div>
 
           <AgentChatComposer
             value={draftValue}
